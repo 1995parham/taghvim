@@ -6,10 +6,260 @@
       "id": "world-cup-final-2026",
       "gregorian": "2026-07-19",
       "holiday": false,
-      "title": { "fa": "فینال جام جهانی ۲۰۲۶", "en": "2026 FIFA World Cup final" },
+      "title": {
+        "fa": "فینال جام جهانی ۲۰۲۶",
+        "en": "2026 FIFA World Cup final"
+      },
       "description": {
         "fa": "نمونه‌ای از رویداد یک‌باره با تاریخ میلادی.",
         "en": "An example of a one-off event with a Gregorian date."
+      }
+    },
+    {
+      "id": "eid-al-fitr-1447-1",
+      "jalali": "1405-01-01",
+      "holiday": true,
+      "title": {
+        "fa": "عید سعید فطر",
+        "en": "Eid al-Fitr"
+      },
+      "description": {
+        "fa": "پایان ماه رمضان و آغاز ماه شوال (۱ شوال ۱۴۴۷)؛ هم‌زمان با نوروز.",
+        "en": "The end of Ramadan, 1 Shawwal 1447. It falls on Nowruz this year."
+      }
+    },
+    {
+      "id": "eid-al-fitr-1447-2",
+      "jalali": "1405-01-02",
+      "holiday": true,
+      "title": {
+        "fa": "تعطیل به مناسبت عید سعید فطر",
+        "en": "Eid al-Fitr holiday"
+      },
+      "description": {
+        "fa": "دومین روز تعطیل عید فطر (۲ شوال ۱۴۴۷).",
+        "en": "The second day of the Eid al-Fitr holiday, 2 Shawwal 1447."
+      }
+    },
+    {
+      "id": "imam-sadegh-martyrdom-1447",
+      "jalali": "1405-01-25",
+      "holiday": true,
+      "title": {
+        "fa": "شهادت امام جعفر صادق (ع)",
+        "en": "Martyrdom of Imam Ja'far al-Sadiq"
+      },
+      "description": {
+        "fa": "سالروز شهادت امام ششم شیعیان (۲۵ شوال ۱۴۴۷).",
+        "en": "The anniversary of the martyrdom of the sixth Shia Imam, 25 Shawwal 1447."
+      }
+    },
+    {
+      "id": "eid-al-adha-1447",
+      "jalali": "1405-03-06",
+      "holiday": true,
+      "title": {
+        "fa": "عید سعید قربان",
+        "en": "Eid al-Adha"
+      },
+      "description": {
+        "fa": "عید قربان، دهم ذی‌الحجه ۱۴۴۷.",
+        "en": "The Feast of the Sacrifice, 10 Dhu al-Hijjah 1447."
+      }
+    },
+    {
+      "id": "eid-al-ghadir-1447",
+      "jalali": "1405-03-14",
+      "holiday": true,
+      "title": {
+        "fa": "عید سعید غدیر خم",
+        "en": "Eid al-Ghadir"
+      },
+      "description": {
+        "fa": "عید غدیر خم (۱۸ ذی‌الحجه ۱۴۴۷)؛ هم‌زمان با سالروز رحلت امام خمینی.",
+        "en": "Eid al-Ghadir, 18 Dhu al-Hijjah 1447, on the same day as the anniversary of Khomeini's death."
+      }
+    },
+    {
+      "id": "tasua-1448",
+      "jalali": "1405-04-03",
+      "holiday": true,
+      "title": {
+        "fa": "تاسوعای حسینی",
+        "en": "Tasua"
+      },
+      "description": {
+        "fa": "نهم محرم ۱۴۴۸، روز پیش از عاشورا.",
+        "en": "9 Muharram 1448, the day before Ashura."
+      }
+    },
+    {
+      "id": "ashura-1448",
+      "jalali": "1405-04-04",
+      "holiday": true,
+      "title": {
+        "fa": "عاشورای حسینی",
+        "en": "Ashura"
+      },
+      "description": {
+        "fa": "دهم محرم ۱۴۴۸، سالروز شهادت امام حسین (ع) در کربلا.",
+        "en": "10 Muharram 1448, the anniversary of the martyrdom of Imam Husayn at Karbala."
+      }
+    },
+    {
+      "id": "arbaeen-1448",
+      "jalali": "1405-05-13",
+      "holiday": true,
+      "title": {
+        "fa": "اربعین حسینی",
+        "en": "Arbaeen"
+      },
+      "description": {
+        "fa": "چهلمین روز پس از عاشورا (۲۰ صفر ۱۴۴۸).",
+        "en": "The fortieth day after Ashura, 20 Safar 1448."
+      }
+    },
+    {
+      "id": "prophet-death-imam-hasan-1448",
+      "jalali": "1405-05-21",
+      "holiday": true,
+      "title": {
+        "fa": "رحلت رسول اکرم (ص) و شهادت امام حسن مجتبی (ع)",
+        "en": "Death of the Prophet and martyrdom of Imam Hasan"
+      },
+      "description": {
+        "fa": "سالروز رحلت پیامبر اسلام و شهادت امام حسن (ع) (۲۸ صفر ۱۴۴۸).",
+        "en": "The anniversary of the death of the Prophet Muhammad and the martyrdom of Imam Hasan, 28 Safar 1448."
+      }
+    },
+    {
+      "id": "imam-reza-martyrdom-1448",
+      "jalali": "1405-05-22",
+      "holiday": true,
+      "title": {
+        "fa": "شهادت امام رضا (ع)",
+        "en": "Martyrdom of Imam Reza"
+      },
+      "description": {
+        "fa": "سالروز شهادت امام هشتم شیعیان (آخر صفر ۱۴۴۸).",
+        "en": "The anniversary of the martyrdom of the eighth Shia Imam, the last day of Safar 1448."
+      }
+    },
+    {
+      "id": "imam-hasan-askari-martyrdom-1448",
+      "jalali": "1405-05-30",
+      "holiday": true,
+      "title": {
+        "fa": "شهادت امام حسن عسکری (ع)",
+        "en": "Martyrdom of Imam Hasan al-Askari"
+      },
+      "description": {
+        "fa": "سالروز شهادت امام یازدهم شیعیان (۸ ربیع‌الاول ۱۴۴۸).",
+        "en": "The anniversary of the martyrdom of the eleventh Shia Imam, 8 Rabi al-Awwal 1448."
+      }
+    },
+    {
+      "id": "prophet-birthday-1448",
+      "jalali": "1405-06-08",
+      "holiday": true,
+      "title": {
+        "fa": "میلاد رسول اکرم (ص) و امام جعفر صادق (ع)",
+        "en": "Birthday of the Prophet and Imam Ja'far al-Sadiq"
+      },
+      "description": {
+        "fa": "سالروز میلاد پیامبر اسلام و امام صادق (ع) (۱۷ ربیع‌الاول ۱۴۴۸).",
+        "en": "The birthday of the Prophet Muhammad and Imam Ja'far al-Sadiq, 17 Rabi al-Awwal 1448."
+      }
+    },
+    {
+      "id": "fatimah-martyrdom-1448",
+      "jalali": "1405-08-22",
+      "holiday": true,
+      "title": {
+        "fa": "شهادت حضرت فاطمه زهرا (س)",
+        "en": "Martyrdom of Fatimah al-Zahra"
+      },
+      "description": {
+        "fa": "سالروز شهادت حضرت فاطمه (س) (۳ جمادی‌الثانی ۱۴۴۸).",
+        "en": "The anniversary of the martyrdom of Fatimah al-Zahra, 3 Jumada al-Thani 1448."
+      }
+    },
+    {
+      "id": "imam-ali-birthday-1448",
+      "jalali": "1405-10-02",
+      "holiday": true,
+      "title": {
+        "fa": "ولادت امام علی (ع) و روز پدر",
+        "en": "Birthday of Imam Ali and Father's Day"
+      },
+      "description": {
+        "fa": "سالروز ولادت امام علی (ع) و روز پدر (۱۳ رجب ۱۴۴۸).",
+        "en": "The birthday of Imam Ali and Father's Day in Iran, 13 Rajab 1448."
+      }
+    },
+    {
+      "id": "mabath-1448",
+      "jalali": "1405-10-16",
+      "holiday": true,
+      "title": {
+        "fa": "مبعث رسول اکرم (ص)",
+        "en": "Mab'ath"
+      },
+      "description": {
+        "fa": "سالروز بعثت پیامبر اسلام (۲۷ رجب ۱۴۴۸).",
+        "en": "The anniversary of the Prophet Muhammad's first revelation, 27 Rajab 1448."
+      }
+    },
+    {
+      "id": "mid-shaban-1448",
+      "jalali": "1405-11-04",
+      "holiday": true,
+      "title": {
+        "fa": "ولادت حضرت قائم (عج) و جشن نیمه شعبان",
+        "en": "Birthday of Imam Mahdi (Mid-Sha'ban)"
+      },
+      "description": {
+        "fa": "سالروز ولادت امام دوازدهم شیعیان و جشن نیمه شعبان (۱۵ شعبان ۱۴۴۸).",
+        "en": "The birthday of the twelfth Shia Imam and the Mid-Sha'ban celebration, 15 Sha'ban 1448."
+      }
+    },
+    {
+      "id": "imam-ali-martyrdom-1448",
+      "jalali": "1405-12-09",
+      "holiday": true,
+      "title": {
+        "fa": "شهادت حضرت علی (ع)",
+        "en": "Martyrdom of Imam Ali"
+      },
+      "description": {
+        "fa": "سالروز شهادت امام علی (ع) (۲۱ رمضان ۱۴۴۸).",
+        "en": "The anniversary of the martyrdom of Imam Ali, 21 Ramadan 1448."
+      }
+    },
+    {
+      "id": "eid-al-fitr-1448-1",
+      "jalali": "1405-12-19",
+      "holiday": true,
+      "title": {
+        "fa": "عید سعید فطر",
+        "en": "Eid al-Fitr"
+      },
+      "description": {
+        "fa": "پایان ماه رمضان و آغاز ماه شوال (۱ شوال ۱۴۴۸).",
+        "en": "The end of Ramadan, 1 Shawwal 1448."
+      }
+    },
+    {
+      "id": "eid-al-fitr-1448-2",
+      "jalali": "1405-12-20",
+      "holiday": true,
+      "title": {
+        "fa": "تعطیل به مناسبت عید سعید فطر",
+        "en": "Eid al-Fitr holiday"
+      },
+      "description": {
+        "fa": "دومین روز تعطیل عید فطر (۲ شوال ۱۴۴۸).",
+        "en": "The second day of the Eid al-Fitr holiday, 2 Shawwal 1448."
       }
     }
   ]
