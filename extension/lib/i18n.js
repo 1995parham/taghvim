@@ -39,6 +39,8 @@ const STRINGS = {
     refresh: 'به‌روزرسانی',
     settings: 'تنظیمات',
     source: 'منبع داده',
+    prevPhoto: 'عکس قبلی',
+    nextPhoto: 'عکس بعدی',
   },
   en: {
     today: 'Today',
@@ -50,6 +52,8 @@ const STRINGS = {
     refresh: 'Refresh',
     settings: 'Settings',
     source: 'Data source',
+    prevPhoto: 'Previous photo',
+    nextPhoto: 'Next photo',
   },
 };
 
