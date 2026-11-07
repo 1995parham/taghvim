@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Taghvim</title>
+  <link rel="stylesheet" href="calendar.css">
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"><img id="bg-img" alt=""></div>
+  <main class="layout">
+    <section class="hero">
+      <div id="clock" class="clock"></div>
+      <div id="hero-weekday" class="hero-weekday"></div>
+      <div id="hero-j" class="hero-j"></div>
+      <div id="hero-g" class="hero-g"></div>
+      <div id="hero-h" class="hero-g"></div>
+      <div id="hero-events" class="hero-events"></div>
+
+      <h2 id="upcoming-title" class="section-title"></h2>
+      <ol id="upcoming" class="upcoming"></ol>
+    </section>
+
+    <section class="card">
+      <!-- calendar.js renders this card. -->
+      <header class="bar">
+        <button id="prev" class="icon" type="button">‹</button>
+        <div class="title">
+          <div id="month-j" class="month-j"></div>
+          <div id="month-g" class="month-g"></div>
+          <div id="month-h" class="month-g"></div>
+        </div>
+        <button id="next" class="icon" type="button">›</button>
+      </header>
+
+      <div id="weekdays" class="grid weekdays"></div>
+      <div id="days" class="grid days"></div>
+
+      <div id="error" class="error" hidden></div>
+
+      <section id="details" class="details">
+        <div class="date-line">
+          <div id="sel-j" class="sel-j"></div>
+          <div id="sel-g" class="sel-g"></div>
+          <div id="sel-h" class="sel-g"></div>
+        </div>
+        <div id="events"></div>
+      </section>
+
+      <footer class="bar footer">
+        <button id="today" type="button"></button>
+        <a id="source" target="_blank" rel="noopener"></a>
+        <span class="spacer"></span>
+        <button id="refresh" class="icon" type="button">⟳</button>
+        <button id="settings" class="icon" type="button">⚙</button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Location of the background photo. newtab.js fills it from backgrounds.json. -->
+  <figure class="location" hidden>
+    <div class="loc-place"><span class="pin" aria-hidden="true">📍</span><span id="loc-place"></span></div>
+    <div id="loc-region" class="loc-region"></div>
+    <a id="loc-credit" class="loc-credit" dir="ltr" target="_blank" rel="noopener"></a>
+  </figure>
+
+  <template id="event-tpl">
+    <article class="event">
+      <img class="event-img" alt="">
+      <div class="event-body">
+        <div class="event-head">
+          <h3 class="event-title"></h3>
+          <span class="tag" hidden></span>
+        </div>
+        <p class="event-desc"></p>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="calendar.js"></script>
+  <script type="module" src="newtab.js"></script>
+</body>
+</html>
