@@ -93,21 +93,41 @@ The extension has no toolbar button and no background script. To open the settin
 
 ## Release
 
-The `release` workflow makes a GitHub release when you push a tag `v<version>`:
+There are two kinds of release. Both are on the [releases page](https://github.com/1995parham/taghvim/releases), with the `.zip` and `.xpi` files.
 
-1. Change `version` in `extension/manifest.json`, for example to `1.4.0`, and commit the change.
-2. Run `git tag v1.4.0` and `git push origin main v1.4.0`.
+### Code release
 
-The workflow does these steps:
-1. It stops if the tag and the manifest version are not the same.
-2. It runs the tests.
-3. It gets the latest data from the data repository.
-4. It builds the packages.
-5. It makes the release with the `.zip` and `.xpi` files.
+1. Change `version` in `extension/manifest.json`, for example to `1.5.0`, and commit the change.
+2. Run `git tag v1.5.0` and `git push origin main v1.5.0`.
 
-If the repository has the secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` (API keys from https://addons.mozilla.org/developers/addon/api/key/), the workflow also gets a Mozilla signature for the add-on as an unlisted add-on. It then adds `taghvim-<version>-signed.xpi` to the release. The normal release of Firefox can install this file permanently.
+The `release` workflow stops if the tag and the manifest version are not the same. It runs the tests, builds the code of the tag with the latest data, and makes the release.
 
-The `ci` workflow runs the tests and the build on each push and pull request.
+### Data release
+
+A change to the [data repository](https://github.com/1995parham/taghvim-data) makes a new release automatically, so people can change the holidays and photos without a change to this repository. The workflow builds the code of the latest code release with the new data. The version adds the workflow run number, for example `1.5.0.12`. Thus the next code release (for example `1.5.1`) is always higher.
+
+A data release starts in these ways:
+
+- The data repository sends a `data-updated` event after each push to `main`. This needs the secret `TAGHVIM_RELEASE_TOKEN` in the data repository (see its README).
+- A daily check at 03:17 UTC makes a release if the data changed since the last release.
+- By hand: Actions → release → "Run workflow".
+
+The notes of each release contain the data commit (`<!-- data-commit: … -->`). The workflow compares it to find changes.
+
+### Use another data repository
+
+To build the extension with a fork of the data repository, set these repository variables in Settings → Secrets and variables → Actions → Variables:
+
+- `DATA_REPOSITORY`: `owner/repo` of the data, for example `someone/taghvim-data`
+- `DATA_BRANCH`: the branch (default `main`)
+
+The build writes the data repository into `extension/data/source.json`. The extension then uses it as its default data source, so the next release reads its updates from the fork. Locally, use `DATA_REPOSITORY=someone/taghvim-data ./scripts/build.sh`.
+
+### Firefox signature
+
+With the secrets `AMO_JWT_ISSUER` and `AMO_JWT_SECRET` (API keys from https://addons.mozilla.org/developers/addon/api/key/), each release also gets a Mozilla signature for the add-on as an unlisted add-on. The workflow adds `taghvim-<version>-signed.xpi`, which all Firefox versions can install permanently.
+
+The `ci` workflow runs the tests, the data check, the build, and `web-ext lint` on each push and pull request.
 
 ## Permissions
 
