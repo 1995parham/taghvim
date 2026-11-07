@@ -1,4 +1,5 @@
 {
+  "$schema": "./hijri.schema.json",
   "adjust": 0,
   "months": []
 }
