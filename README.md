@@ -9,9 +9,9 @@ Taghvim is a browser extension for Chrome, Firefox, and Safari. It replaces the 
 - The week starts on Saturday. Fridays and holidays show in red.
 - The details panel shows the full Jalali and Gregorian date, and the events of the selected day. Each event has a title, a description of one or two lines, and an optional image.
 - A different background photo each day from the data repository, with its location written over the photo.
-- Works offline: the page keeps the data and the photos on the computer, and downloads the photos of the next 3 days in advance. The extension also contains a copy of the data (`extension/data/`, made by `scripts/sync-data.sh` at each build), so holidays show offline even on the first run.
+- Fast and offline first: the build contains all the data and all the photos (`extension/data/`, made by `scripts/sync-data.sh`). The page renders from the computer in less than 0.1 s and never waits for the network. After the first render, it checks GitHub (at most once in 10 minutes, with an 8-second time limit). If the data changed, it renders again. A photo that was added after the build fades in when its download completes.
 - Persian (RTL) and English user interfaces.
-- The extension keeps the data in a local cache for six hours. If GitHub is not available, the extension uses the last copy.
+- The ⟳ button checks GitHub immediately.
 - No external libraries and no build step. The Jalali conversion is in `extension/lib/jalali.js`, and a test compares it with the ICU Persian calendar for each day from 1950 to 2100.
 
 ## Layout
@@ -22,7 +22,7 @@ extension/            the WebExtension (Manifest V3), the same code for all brow
   newtab/             the new tab page: calendar.js (the calendar card) and newtab.js (clock, today, upcoming)
   options/            the settings page (repository, branch, language)
   lib/                jalali.js, hijri.js, backgrounds.js, data.js, i18n.js, settings.js
-extension/data/       a copy of the data repository inside the extension, for offline use
+extension/data/       a copy of the data repository (with the photos) inside the extension
 data-repo/            the data repository (a separate git repository, not part of this one)
 scripts/build.sh      makes the store packages in dist/ (it runs scripts/sync-data.sh first)
 scripts/sync-data.sh  copies the data repository into extension/data/ for offline use
@@ -117,4 +117,4 @@ The extension does not need host permissions. `raw.githubusercontent.com` sends 
 
 ## Background photos
 
-The daily photos come from `backgrounds.json` in the data repository (see `data-repo/README.md`). The extension also contains one photo, which it shows before it has downloaded any photo and when it is offline for the first time. This photo shows the Pont del Petroli in Badalona, Catalonia, Spain, at sunset: [01 Platja de l'Estació al capvespre (Badalona), al fons el pont del Petroli](https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg) by Enric, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The file `extension/newtab/background.jpg` is a copy resized to 2560 × 1920. The page shows the location and the credit of each photo in the bottom-right corner. Do not remove the credit, because the photo licenses require it.
+The daily photos come from `backgrounds.json` in the data repository (see `data-repo/README.md`). The build copies all of them into `extension/data/backgrounds/`. If no photo list is available, the page shows the Pont del Petroli in Badalona, Catalonia, Spain, at sunset: [01 Platja de l'Estació al capvespre (Badalona), al fons el pont del Petroli](https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg) by Enric, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The page shows the location and the credit of each photo in the bottom-right corner. Do not remove the credit, because the photo licenses require it.
