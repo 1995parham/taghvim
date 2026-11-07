@@ -23,6 +23,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "taghvim@1995parham.github.io",
+      "update_url": "https://github.com/1995parham/taghvim/releases/latest/download/updates.json",
       "strict_min_version": "121.0",
       "data_collection_permissions": {
         "required": [
