@@ -1,18 +1,22 @@
 // Daily background photo from the data repository, with offline support.
 //
 // - backgrounds.json lists the photos. The page shows one photo each day (same photo for all users).
-// - Each downloaded photo is kept in the Cache API, so it shows again without a network.
-// - Offline and today's photo not saved: show the most recent saved photo.
-// - Nothing saved at all: show the photo that is inside the extension (BUILTIN).
+// - The build puts all photos inside the extension (extension/data/backgrounds/).
+// - Photos added to GitHub after the build are downloaded and kept in the Cache API.
+// - The page never waits for the network for the first photo (localBackground):
+//   today's photo from the extension or the cache, else the closest earlier day's photo,
+//   else the built-in photo.
+// - If today's photo is new (not in the build, not saved yet), downloadToday() gets it in the
+//   background, and the page fades it in.
 
-import { imageUrl } from './data.js';
+import { imageUrl, bundledUrl, bundledBackgroundImages } from './data.js';
 
 const CACHE_NAME = 'taghvim-backgrounds-v1';
 const PREFETCH_DAYS = 3; // save the photos of the next days for offline use
 
 export const BUILTIN = Object.freeze({
   id: 'builtin',
-  src: 'background.jpg',
+  src: '../data/backgrounds/badalona-pont-del-petroli-sunset.jpg',
   position: 'center 40%',
   place: { fa: 'پونت دل پترولی (اسکله نفت)', en: 'Pont del Petroli' },
   region: { fa: 'بادالونا، کاتالونیا، اسپانیا', en: 'Badalona, Catalonia, Spain' },
@@ -50,42 +54,51 @@ async function download(cache, url) {
 }
 
 /**
- * Returns { entry, src } for today. src is an object URL or the built-in file.
- * Never throws.
+ * The photo to show now, from the computer only. Never throws.
+ * Returns { entry, src, isToday }. src is an object URL or the built-in file.
  */
-export async function resolveBackground(s, list, day = dayNumber()) {
-  if (!Array.isArray(list) || !list.length) return { entry: BUILTIN, src: BUILTIN.src };
-  const cache = await openCache();
-
-  const today = entryFor(list, day);
-  const url = imageUrl(s, today.image);
-  if (url) {
-    let blob = await fromCache(cache, url);
-    if (!blob) blob = await download(cache, url).catch(() => null);
-    if (blob) return { entry: today, src: URL.createObjectURL(blob) };
-  }
-
-  // Offline: use the photo of the closest earlier day that is saved.
-  for (let back = 1; back <= list.length; back += 1) {
+export async function localBackground(s, list, day = dayNumber()) {
+  if (!Array.isArray(list) || !list.length) return { entry: BUILTIN, src: BUILTIN.src, isToday: false };
+  const [cache, bundled] = await Promise.all([openCache(), bundledBackgroundImages()]);
+  // back = 0 is today; then the closest earlier day that has a photo on the computer.
+  for (let back = 0; back < list.length; back += 1) {
     const e = entryFor(list, day - back);
-    const blob = await fromCache(cache, imageUrl(s, e.image));
-    if (blob) return { entry: e, src: URL.createObjectURL(blob) };
+    if (bundled.has(e.image)) return { entry: e, src: bundledUrl(e.image), isToday: back === 0 };
+    const url = imageUrl(s, e.image);
+    const blob = url ? await fromCache(cache, url).catch(() => null) : null;
+    if (blob) return { entry: e, src: URL.createObjectURL(blob), isToday: back === 0 };
   }
-  return { entry: BUILTIN, src: BUILTIN.src };
+  return { entry: BUILTIN, src: BUILTIN.src, isToday: false };
+}
+
+/** Downloads and saves today's photo. Returns { entry, src } or null (offline, error). */
+export async function downloadToday(s, list, day = dayNumber()) {
+  if (!Array.isArray(list) || !list.length) return null;
+  const entry = entryFor(list, day);
+  const url = imageUrl(s, entry.image);
+  if (!url) return null;
+  try {
+    const blob = await download(await openCache(), url);
+    return { entry, src: URL.createObjectURL(blob) };
+  } catch {
+    return null;
+  }
 }
 
 /** Saves the photos of the next days, and removes saved photos that are not in the list. */
 export async function prefetchBackgrounds(s, list, day = dayNumber()) {
   const cache = await openCache();
   if (!cache || !Array.isArray(list) || !list.length) return;
-  const wanted = new Set(list.map((e) => imageUrl(s, e.image)).filter(Boolean));
+  const bundled = await bundledBackgroundImages();
+  // Only photos that are not inside the extension are downloaded and kept.
+  const wanted = new Set(list.filter((e) => !bundled.has(e.image)).map((e) => imageUrl(s, e.image)).filter(Boolean));
 
   for (const req of await cache.keys()) {
     if (!wanted.has(req.url)) await cache.delete(req);
   }
   for (let i = 1; i <= Math.min(PREFETCH_DAYS, list.length - 1); i += 1) {
     const url = imageUrl(s, entryFor(list, day + i).image);
-    if (url && !(await cache.match(url))) {
+    if (url && wanted.has(url) && !(await cache.match(url))) {
       await download(cache, url).catch(() => {});
     }
   }
