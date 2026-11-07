@@ -1,0 +1,70 @@
+<!doctype html>
+<!-- Dev preview of the new tab page without installing the extension.
+     Serve the project root:  python3 -m http.server 8000
+     Open: http://localhost:8000/tests/preview.html?date=2026-03-21&lang=en
+     Data comes from ../data-repo instead of GitHub.
+     Add &offline=1 to make photo downloads fail (saved photos still show). -->
+<meta charset="utf-8">
+<link rel="stylesheet" href="../extension/newtab/calendar.css">
+<link rel="stylesheet" href="../extension/newtab/newtab.css">
+<script>
+(() => {
+  const report = (m) => { const p = document.createElement('pre'); p.style.cssText = 'color:red;white-space:pre-wrap'; p.textContent = m; document.body.prepend(p); };
+  window.addEventListener('error', (e) => report(String(e.message)));
+  window.addEventListener('unhandledrejection', (e) => report(String(e.reason?.stack ?? e.reason)));
+  const q = new URLSearchParams(location.search);
+  const toLocal = (u) => {
+    const v = String(u);
+    if (v === 'background.jpg') return '/extension/newtab/background.jpg'; // the built-in photo
+    return v.replace(/^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+\//, '/data-repo/');
+  };
+  const mem = {};
+  const sync = q.get('lang') ? { lang: q.get('lang') } : {};
+  window.chrome = {
+    storage: {
+      sync: { get: async () => ({ ...sync }), set: async () => {} },
+      local: { get: async (k) => (k in mem ? { [k]: mem[k] } : {}), set: async (o) => Object.assign(mem, o), clear: async () => {} },
+    },
+    runtime: { sendMessage: async () => {}, openOptionsPage: () => {} },
+  };
+  // Synchronous fetch, so the page renders before the load event (headless screenshots).
+  const syncGet = (u) => { const x = new XMLHttpRequest(); x.open('GET', u, false); x.send(); return x; };
+  const files = {};
+  for (const f of ['recurring.json', 'hijri.json', 'backgrounds.json', 'years/1404.json', 'years/1405.json', 'years/1406.json']) {
+    const x = syncGet('/data-repo/' + f);
+    files['/data-repo/' + f] = x;
+  }
+  const realFetch = window.fetch.bind(window);
+  window.fetch = async (u, o) => {
+    const local = toLocal(u);
+    if (local.endsWith('.json')) {
+      const x = files[local] ?? { status: 404 };
+      return { ok: x.status === 200, status: x.status, json: async () => JSON.parse(x.responseText) };
+    }
+    if (q.get('offline')) throw new TypeError('NetworkError (simulated offline)');
+    return realFetch(local, o);
+  };
+  const desc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  Object.defineProperty(HTMLImageElement.prototype, 'src', { set(v) { desc.set.call(this, toLocal(v)); }, get() { return desc.get.call(this); } });
+  if (q.get('date')) {
+    const [y, m, d] = q.get('date').split('-').map(Number);
+    const RealDate = Date;
+    window.Date = class extends RealDate { constructor(...a) { if (a.length) super(...a); else super(y, m - 1, d, 12); } };
+    Date.UTC = RealDate.UTC; Date.now = RealDate.now;
+  }
+  const pageHtml = syncGet('../extension/newtab/newtab.html').responseText;
+  document.addEventListener('DOMContentLoaded', () => {
+    const doc = new DOMParser().parseFromString(pageHtml, 'text/html');
+    doc.querySelectorAll('script').forEach((s) => s.remove());
+    document.body.replaceChildren(...doc.body.childNodes);
+    const scripts = ['../extension/newtab/calendar.js', '../extension/newtab/newtab.js'];
+    for (const src of scripts) {
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = src;
+      document.body.append(s);
+    }
+  });
+})();
+</script>
+<body></body>
