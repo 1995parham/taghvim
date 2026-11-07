@@ -1,6 +1,6 @@
 import { api, loadSettings } from '../lib/settings.js';
 import { todayJalali, toGregorian, jalaliMonthLength, weekdaySat, jKey } from '../lib/jalali.js';
-import { loadYearIndex, loadHijri, imageUrl, bundledUrl, repoUrl, pick, clearCache } from '../lib/data.js';
+import { loadYearIndex, loadHijri, syncFromGitHub, filesFor, imageUrl, bundledUrl, repoUrl, pick } from '../lib/data.js';
 import { toHijri } from '../lib/hijri.js';
 import { t, num, hijriLabel, JALALI_MONTHS, GREGORIAN_MONTHS, HIJRI_MONTHS, WEEKDAYS, WEEKDAYS_SHORT } from '../lib/i18n.js';
 
@@ -21,13 +21,20 @@ const state = {
 async function ensureIndex(jy, force = false) {
   if (!force && state.indexYear === jy) return;
   try {
-    state.index = await loadYearIndex(state.settings, jy, { force });
+    state.index = await loadYearIndex(state.settings, jy);
     state.error = null;
   } catch (err) {
     state.index = new Map();
     state.error = err.message;
   }
   state.indexYear = jy;
+
+  // A year far from today (the user moved the calendar): check GitHub for it in the background.
+  if (jy !== state.today.jy && jy !== state.today.jy + 1) {
+    syncFromGitHub(state.settings, [`years/${jy}.json`]).then((changed) => {
+      if (changed && state.view.jy === jy) render(true);
+    });
+  }
 }
 
 function gregorianLabel(g, lang) {
@@ -127,13 +134,13 @@ function renderDetails() {
     const img = node.querySelector('.event-img');
     const src = imageUrl(state.settings, ev.image);
     if (src) {
-      // Offline: use the copy inside the extension, then hide the image.
+      // The copy inside the extension first (fast, offline); a new image comes from GitHub.
       const local = bundledUrl(ev.image);
       img.addEventListener('error', () => {
-        if (local && img.src !== local) img.src = local;
+        if (img.src !== src) img.src = src;
         else img.remove();
       });
-      img.src = src;
+      img.src = local ?? src;
     } else {
       img.remove();
     }
@@ -198,7 +205,7 @@ function applyLanguage() {
 
 async function main() {
   state.settings = await loadSettings();
-  state.hijri = await loadHijri(state.settings).catch(() => null);
+  state.hijri = await loadHijri(state.settings);
   state.view = { jy: state.today.jy, jm: state.today.jm };
   state.selected = { ...state.today };
   applyLanguage();
@@ -212,10 +219,19 @@ async function main() {
     render();
   });
   $('refresh').addEventListener('click', async () => {
-    await clearCache();
-    location.reload(); // newtab.js reloads its parts too
+    const btn = $('refresh');
+    btn.disabled = true;
+    const years = new Set([state.today.jy, state.today.jy + 1, state.view.jy]);
+    await syncFromGitHub(state.settings, filesFor([...years]), { force: true });
+    location.reload(); // newtab.js renders its parts again too
   });
   $('settings').addEventListener('click', () => api.runtime.openOptionsPage());
+
+  // newtab.js checks GitHub after the first render; render again if the data changed.
+  window.addEventListener('taghvim:data-changed', async () => {
+    state.hijri = await loadHijri(state.settings);
+    render(true);
+  });
 
   await render();
 }
