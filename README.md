@@ -8,7 +8,7 @@ Taghvim is a browser extension for Chrome, Firefox, and Safari. It replaces the 
 - A month view in the Jalali calendar. Each day also shows the Gregorian day number.
 - The week starts on Saturday. Fridays and holidays show in red.
 - The details panel shows the full Jalali and Gregorian date, and the events of the selected day. Each event has a title, a description of one or two lines, and an optional image.
-- A different background photo each day from the data repository, with its location written over the photo.
+- A different background photo each day from the data repository, with its location and a short description written over the photo. The ‹ › buttons change the photo; the choice stays for the rest of the day.
 - Fast and offline first: the build contains all the data and all the photos (`extension/data/`, made by `scripts/sync-data.sh`). The page renders from the computer in less than 0.1 s and never waits for the network. After the first render, it checks GitHub (at most once in 10 minutes, with an 8-second time limit). If the data changed, it renders again. A photo that was added after the build fades in when its download completes.
 - Persian (RTL) and English user interfaces.
 - The ⟳ button checks GitHub immediately.
@@ -137,4 +137,4 @@ The extension does not need host permissions. `raw.githubusercontent.com` sends 
 
 ## Background photos
 
-The daily photos come from `backgrounds.json` in the data repository (see `data-repo/README.md`). The build copies all of them into `extension/data/backgrounds/`. If no photo list is available, the page shows the Pont del Petroli in Badalona, Catalonia, Spain, at sunset: [01 Platja de l'Estació al capvespre (Badalona), al fons el pont del Petroli](https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg) by Enric, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The page shows the location and the credit of each photo in the bottom-right corner. Do not remove the credit, because the photo licenses require it.
+The daily photos come from `backgrounds.json` in the data repository (see `data-repo/README.md`). The photos are WebP files of about 400 KB, and the build copies all of them into `extension/data/backgrounds/`. If no photo list is available, the page shows the Pont del Petroli in Badalona, Catalonia, Spain, at sunset: [01 Platja de l'Estació al capvespre (Badalona), al fons el pont del Petroli](https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg) by Enric, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The page shows the location and the credit of each photo in the bottom-right corner. Do not remove the credit, because the photo licenses require it.
