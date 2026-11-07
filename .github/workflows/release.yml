@@ -1,0 +1,70 @@
+name: release
+
+# Push a tag v<version> (the same as "version" in extension/manifest.json) to make a release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      # Optional. With these secrets, the release also has a Firefox file signed by Mozilla.
+      AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+      AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check the version
+        id: version
+        run: |
+          version=$(node -p "require('./extension/manifest.json').version")
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::The tag ${GITHUB_REF_NAME} is not v${version} (extension/manifest.json)."
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Test
+        run: node --test tests/
+
+      - name: Get the latest data
+        uses: actions/checkout@v4
+        with:
+          repository: 1995parham/taghvim-data
+          path: data-repo
+
+      - name: Validate the data
+        working-directory: data-repo
+        run: node scripts/validate.mjs
+
+      - name: Build
+        run: ./scripts/build.sh
+
+      - name: Sign for Firefox (unlisted)
+        if: env.AMO_JWT_ISSUER != '' && env.AMO_JWT_SECRET != ''
+        run: |
+          npx --yes web-ext@8 sign \
+            --source-dir extension \
+            --channel unlisted \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET" \
+            --artifacts-dir dist/signed
+          mv dist/signed/*.xpi "dist/taghvim-${{ steps.version.outputs.version }}-signed.xpi"
+          rm -r dist/signed
+
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/*.zip dist/*.xpi \
+            --verify-tag \
+            --title "Taghvim ${GITHUB_REF_NAME}" \
+            --generate-notes
