@@ -1,4 +1,4 @@
-import { DEFAULTS, loadSettings, saveSettings } from '../lib/settings.js';
+import { DEFAULTS, loadDefaults, loadSettings, saveSettings } from '../lib/settings.js';
 import { rawUrl, clearCache } from '../lib/data.js';
 import { todayJalali } from '../lib/jalali.js';
 
@@ -26,8 +26,8 @@ form.addEventListener('submit', async (e) => {
   show('Saved.', true);
 });
 
-document.getElementById('reset').addEventListener('click', () => {
-  fill(DEFAULTS);
+document.getElementById('reset').addEventListener('click', async () => {
+  fill(await loadDefaults());
   show('Defaults restored. Click Save to keep them.', true);
 });
 
