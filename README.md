@@ -10,6 +10,7 @@ Taghvim is a browser extension for Chrome, Firefox, and Safari. It replaces the 
 - The details panel shows the full Jalali and Gregorian date, and the events of the selected day. Each event has a title, a description of one or two lines, and an optional image.
 - A different background photo each day from the data repository, with its location and a short description written over the photo. The ‹ › buttons change the photo; the choice stays for the rest of the day.
 - Fast and offline first: the build contains all the data and all the photos (`extension/data/`, made by `scripts/sync-data.sh`). The page renders from the computer in less than 0.1 s and never waits for the network. After the first render, it checks GitHub (at most once in 10 minutes, with an 8-second time limit). If the data changed, it renders again. A photo that was added after the build fades in when its download completes.
+- A search box (Google, DuckDuckGo, or Bing, or hidden) and, if you turn it on in the settings, your most visited sites.
 - Persian (RTL) and English user interfaces.
 - The ⟳ button checks GitHub immediately.
 - No external libraries and no build step. The Jalali conversion is in `extension/lib/jalali.js`, and a test compares it with the ICU Persian calendar for each day from 1950 to 2100.
@@ -55,7 +56,7 @@ CAUTION: Step 2 lets Firefox install all unsigned add-ons, not only Taghvim. Ins
 4. Open `about:addons`, click ⚙ → "Install Add-on From File…", and select `taghvim-<version>.xpi`.
 5. Open a new tab. If Firefox asks about the changed new tab page, click "Keep Changes".
 
-Taghvim then stays installed after Firefox restarts. To update, install the `.xpi` file of the new version in the same way.
+Taghvim then stays installed after Firefox restarts. From version 1.6.0, Firefox also updates it automatically: the add-on reads `updates.json` from the latest GitHub release and installs a newer version itself (Firefox checks about once a day; to check now, open `about:addons`, click ⚙, and click "Check for Updates"). Install version 1.6.0 or later once by hand; older versions do not have the update address.
 
 ### Firefox (normal release)
 
@@ -132,6 +133,7 @@ The `ci` workflow runs the tests, the data check, the build, and `web-ext lint` 
 ## Permissions
 
 - `storage`: the settings and the data cache.
+- `topSites` (optional): only if you turn on "Most visited sites" in the settings. The browser asks you first.
 
 The extension does not need host permissions. `raw.githubusercontent.com` sends CORS headers, so the page can read the JSON files directly.
 
