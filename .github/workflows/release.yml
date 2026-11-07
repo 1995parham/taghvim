@@ -178,8 +178,11 @@ jobs:
               --verify-tag --latest --title "Taghvim ${VERSION}" --generate-notes
             notes=$(gh release view "v${VERSION}" --json body -q .body)
           else
+            # The new tag points at the commit this run started from (main), not at CODE_TAG:
+            # the GITHUB_TOKEN may not create a ref whose workflow files differ from main's
+            # ("HTTP 403: Resource not accessible by integration"). The build is still CODE_TAG.
             gh release create "v${VERSION}" dist/*.zip dist/*.xpi dist/updates.json \
-              --latest --target "$(git rev-parse HEAD)" --title "Taghvim ${VERSION} (data update)" \
+              --latest --target "$GITHUB_SHA" --title "Taghvim ${VERSION} (data update)" \
               --notes "Data update: the code of ${CODE_TAG} with the latest data."
             notes=$(gh release view "v${VERSION}" --json body -q .body)
           fi
