@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Keeps the pinned GitHub Actions (commit hashes) up to date.
+  # Keeps the GitHub Actions versions up to date.
   - package-ecosystem: github-actions
     directory: /
     schedule:
