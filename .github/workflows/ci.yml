@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test
+        run: node --test tests/
+
+      - name: Get the latest data
+        uses: actions/checkout@v4
+        with:
+          repository: 1995parham/taghvim-data
+          path: data-repo
+
+      - name: Validate the data
+        working-directory: data-repo
+        run: node scripts/validate.mjs
+
+      - name: Build
+        run: ./scripts/build.sh
+
+      - name: Lint for Firefox
+        run: npx --yes web-ext@8 lint --source-dir extension --self-hosted --warnings-as-errors
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: taghvim
+          path: dist/
