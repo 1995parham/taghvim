@@ -3,7 +3,7 @@
      Serve the project root:  python3 -m http.server 8000
      Open: http://localhost:8000/tests/preview.html?date=2026-03-21&lang=en
      Data comes from ../data-repo instead of GitHub.
-     Add &offline=1 to make photo downloads fail (saved photos still show). -->
+     Add &offline=1 to make GitHub requests fail (saved data and photos still show). -->
 <meta charset="utf-8">
 <link rel="stylesheet" href="../extension/newtab/calendar.css">
 <link rel="stylesheet" href="../extension/newtab/newtab.css">
@@ -15,7 +15,7 @@
   const q = new URLSearchParams(location.search);
   const toLocal = (u) => {
     const v = String(u);
-    if (v === 'background.jpg') return '/extension/newtab/background.jpg'; // the built-in photo
+    if (v.startsWith('../data/')) return '/extension/' + v.slice(3); // the built-in photo
     return v.replace(/^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[^/]+\//, '/data-repo/');
   };
   const mem = {};
@@ -25,7 +25,7 @@
       sync: { get: async () => ({ ...sync }), set: async () => {} },
       local: { get: async (k) => (k in mem ? { [k]: mem[k] } : {}), set: async (o) => Object.assign(mem, o), clear: async () => {} },
     },
-    runtime: { sendMessage: async () => {}, openOptionsPage: () => {} },
+    runtime: { getURL: (p) => `/extension/${p}`, openOptionsPage: () => {} },
   };
   // Synchronous fetch, so the page renders before the load event (headless screenshots).
   const syncGet = (u) => { const x = new XMLHttpRequest(); x.open('GET', u, false); x.send(); return x; };
@@ -37,7 +37,9 @@
   const realFetch = window.fetch.bind(window);
   window.fetch = async (u, o) => {
     const local = toLocal(u);
+    if (local.startsWith('/extension/')) return realFetch(local, o); // the copy inside the extension
     if (local.endsWith('.json')) {
+      if (q.get('offline')) throw new TypeError('NetworkError (simulated offline)');
       const x = files[local] ?? { status: 404 };
       return { ok: x.status === 200, status: x.status, json: async () => JSON.parse(x.responseText) };
     }
