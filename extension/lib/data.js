@@ -8,7 +8,10 @@
 import { api } from './settings.js';
 import { toJalali, toGregorian, isValidJalali, isValidGregorian, jKey } from './jalali.js';
 
-const TTL_MS = 6 * 60 * 60 * 1000;
+// The page never waits for GitHub. It renders from the local copy, then checks GitHub
+// (at most once in CHECK_INTERVAL_MS), and renders again if the data changed.
+const CHECK_INTERVAL_MS = 10 * 60 * 1000;
+const FETCH_TIMEOUT_MS = 8000;
 
 export function rawUrl(s, path) {
   const clean = String(path).replace(/^\/+/, '');
@@ -27,7 +30,15 @@ export function imageUrl(s, image) {
 }
 
 async function fetchJson(url, optional) {
-  const res = await fetch(url, { cache: 'no-cache' });
+  // A network that is connected but does not work can hang; stop after FETCH_TIMEOUT_MS.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+  let res;
+  try {
+    res = await fetch(url, { cache: 'no-cache', signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   if (res.status === 404 && optional) return null;
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   return res.json();
@@ -37,6 +48,12 @@ async function fetchJson(url, optional) {
 export function bundledUrl(path) {
   if (!path || /^[a-z]+:/i.test(path) || !api?.runtime?.getURL) return null;
   return api.runtime.getURL(`data/${String(path).replace(/^\/+/, '')}`);
+}
+
+/** Image paths of the background photos inside the extension. */
+export async function bundledBackgroundImages() {
+  const data = await bundledJson('backgrounds.json');
+  return new Set((data?.backgrounds ?? []).map((b) => b.image));
 }
 
 async function bundledJson(path) {
@@ -50,33 +67,47 @@ async function bundledJson(path) {
   }
 }
 
+const keyOf = (s, path) => `v2:${prefixOf(s)}:${path}`;
+
 /**
- * Loads one JSON file of the data repository. The order is:
- *   1. the saved copy, if it is younger than TTL_MS
- *   2. GitHub
- *   3. the saved copy of any age (offline)
- *   4. the copy inside the extension (offline on the first run, or the file is not on GitHub)
+ * Reads one JSON file of the data repository from the computer only (fast, works offline):
+ * the copy saved from GitHub, else the copy inside the extension, else null.
  */
-async function cached(s, path, force) {
-  // v2: older versions saved "null" for files that were not on GitHub.
-  const key = `v2:${prefixOf(s)}:${path}`;
+async function readLocal(s, path) {
+  const key = keyOf(s, path);
   const hit = (await api.storage.local.get(key))[key];
-  if (!force && hit && Date.now() - hit.at < TTL_MS && hit.data != null) return hit.data;
-  let data;
-  try {
-    data = await fetchJson(rawUrl(s, path), true);
-  } catch (err) {
-    if (hit?.data != null) return hit.data;
-    const local = await bundledJson(path);
-    if (local != null) return local;
-    throw err;
-  }
-  if (data == null) data = await bundledJson(path);
-  await api.storage.local.set({ [key]: { at: Date.now(), data } });
-  return data;
+  if (hit?.data != null) return hit.data;
+  return bundledJson(path);
 }
 
-/** Removes the saved JSON data. Saved background photos stay, so they still work offline. */
+/**
+ * Downloads files from GitHub and saves them. Files checked less than CHECK_INTERVAL_MS ago
+ * are skipped, unless force is true. Errors (offline, timeout) keep the saved copy.
+ * Returns true if a saved file changed, so the page can render again.
+ */
+export async function syncFromGitHub(s, paths, { force = false } = {}) {
+  const results = await Promise.all(paths.map(async (path) => {
+    const key = keyOf(s, path);
+    const hit = (await api.storage.local.get(key))[key];
+    if (!force && hit && Date.now() - hit.at < CHECK_INTERVAL_MS) return false;
+    let data;
+    try {
+      data = await fetchJson(rawUrl(s, path), true);
+    } catch {
+      return false;
+    }
+    await api.storage.local.set({ [key]: { at: Date.now(), data } });
+    return JSON.stringify(data) !== JSON.stringify(hit?.data ?? null);
+  }));
+  return results.some(Boolean);
+}
+
+/** The files that the new tab page uses for the Jalali years in the list. */
+export function filesFor(years) {
+  return ['recurring.json', 'hijri.json', 'backgrounds.json', ...years.map((y) => `years/${y}.json`)];
+}
+
+/** Removes the saved JSON data (the copy inside the extension stays). Saved photos also stay. */
 export async function clearCache() {
   await api.storage.local.clear();
 }
@@ -90,24 +121,24 @@ function prefixOf(s) {
 }
 
 /** hijri.json: official Hijri month starts. Returns null if the file does not exist. */
-export async function loadHijri(s, { force = false } = {}) {
-  return cached(s, 'hijri.json', force);
+export async function loadHijri(s) {
+  return readLocal(s, 'hijri.json');
 }
 
 /** backgrounds.json: the list of daily background photos. Returns [] if the file does not exist. */
-export async function loadBackgroundList(s, { force = false } = {}) {
-  const data = await cached(s, 'backgrounds.json', force);
+export async function loadBackgroundList(s) {
+  const data = await readLocal(s, 'backgrounds.json');
   return Array.isArray(data?.backgrounds) ? data.backgrounds : [];
 }
 
 /**
  * Builds a Map of "jy-jm-jd" -> [event] for one Jalali year.
- * Throws only if GitHub, the saved copy, and the copy in the extension all fail.
+ * It reads only the local copy; call syncFromGitHub() to update it.
  */
-export async function loadYearIndex(s, jy, { force = false } = {}) {
+export async function loadYearIndex(s, jy) {
   const [recurring, year] = await Promise.all([
-    cached(s, 'recurring.json', force),
-    cached(s, `years/${jy}.json`, force),
+    readLocal(s, 'recurring.json'),
+    readLocal(s, `years/${jy}.json`),
   ]);
 
   const index = new Map();
