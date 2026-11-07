@@ -58,10 +58,15 @@
     </section>
   </main>
 
-  <!-- Location of the background photo. newtab.js fills it from backgrounds.json. -->
-  <figure class="location" hidden>
+  <!-- The background photo: ‹ › to change it, then its location, description, and credit (from backgrounds.json). -->
+  <figure class="location">
+    <div class="loc-nav" dir="ltr">
+      <button id="bg-prev" class="loc-btn" type="button">‹</button>
+      <button id="bg-next" class="loc-btn" type="button">›</button>
+    </div>
     <div class="loc-place"><span class="pin" aria-hidden="true">📍</span><span id="loc-place"></span></div>
     <div id="loc-region" class="loc-region"></div>
+    <p id="loc-desc" class="loc-desc"></p>
     <a id="loc-credit" class="loc-credit" dir="ltr" target="_blank" rel="noopener"></a>
   </figure>
 

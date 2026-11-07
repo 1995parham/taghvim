@@ -99,6 +99,30 @@ body {
 .loc-place { font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .pin { font-size: 14px; }
 .loc-region { font-size: 13px; opacity: 0.85; }
+.loc-desc {
+  max-width: 380px;
+  margin: 4px 0 0 auto;
+  font-size: 12px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+.loc-nav { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 8px; }
+.loc-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff;
+  background: rgb(0 0 0 / 0.35);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-shadow: none;
+}
+.loc-btn:hover { background: rgb(0 0 0 / 0.55); }
+.loc-btn:disabled { opacity: 0.5; cursor: progress; }
 .loc-credit { display: inline-block; margin-top: 2px; font-size: 10px; color: rgb(255 255 255 / 0.6); text-decoration: none; }
 .loc-credit:hover { color: #fff; text-decoration: underline; }
 @media (max-width: 860px) { .location { position: static; margin-top: 24px; justify-self: end; } }

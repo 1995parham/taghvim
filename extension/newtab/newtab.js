@@ -3,8 +3,8 @@ import { loadSettings } from '../lib/settings.js';
 import { todayJalali, toGregorian, toJalali, weekdaySat, jKey } from '../lib/jalali.js';
 import { loadYearIndex, loadHijri, loadBackgroundList, syncFromGitHub, filesFor, imageUrl, bundledUrl, pick } from '../lib/data.js';
 import { toHijri } from '../lib/hijri.js';
-import { BUILTIN, localBackground, downloadToday, prefetchBackgrounds, dayNumber } from '../lib/backgrounds.js';
-import { num, hijriLabel, JALALI_MONTHS, GREGORIAN_MONTHS, WEEKDAYS } from '../lib/i18n.js';
+import { BUILTIN, localBackground, photoAt, prefetchBackgrounds, dayNumber, loadChoice, saveChoice } from '../lib/backgrounds.js';
+import { num, t, hijriLabel, JALALI_MONTHS, GREGORIAN_MONTHS, WEEKDAYS } from '../lib/i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const UPCOMING_DAYS = 60;
@@ -112,11 +112,14 @@ function renderLocation(s, entry) {
   const { lang } = s;
   $('loc-place').textContent = pick(entry.place, lang);
   $('loc-region').textContent = pick(entry.region, lang);
+  const desc = pick(entry.description, lang);
+  $('loc-desc').textContent = desc;
+  $('loc-desc').hidden = !desc;
   const credit = $('loc-credit');
   credit.textContent = entry.credit ?? '';
   if (/^https:\/\//.test(entry.source ?? '')) credit.href = entry.source;
   else credit.removeAttribute('href');
-  document.querySelector('.location').hidden = !pick(entry.place, lang);
+  document.querySelector('.loc-place').hidden = !pick(entry.place, lang);
 }
 
 let latestPhoto = null;
@@ -158,6 +161,37 @@ async function renderData(s, j) {
   renderUpcoming(s, j, index);
 }
 
+/** The ‹ › buttons. getList() returns the current photo list (it can change after a sync). */
+function setupPhotoButtons(s, getList, day, photo) {
+  $('bg-prev').title = t(s.lang, 'prevPhoto');
+  $('bg-next').title = t(s.lang, 'nextPhoto');
+  const buttons = [$('bg-prev'), $('bg-next')];
+
+  async function step(delta) {
+    const list = getList();
+    if (!list.length) return;
+    buttons.forEach((b) => { b.disabled = true; });
+    try {
+      // Skip photos that are not on the computer and cannot download (offline).
+      for (let tries = 0; tries < list.length; tries += 1) {
+        photo.offset = (((photo.offset + delta) % list.length) + list.length) % list.length;
+        const p = await photoAt(s, list, day + photo.offset);
+        if (p) {
+          photo.chosen = true;
+          showPhoto(s, p.entry, p.src);
+          await saveChoice(day, photo.offset);
+          return;
+        }
+      }
+    } finally {
+      buttons.forEach((b) => { b.disabled = false; });
+    }
+  }
+
+  $('bg-prev').addEventListener('click', () => step(-1));
+  $('bg-next').addEventListener('click', () => step(1));
+}
+
 async function main() {
   const s = await loadSettings();
   document.title = s.lang === 'fa' ? 'زبانه جدید' : 'New Tab';
@@ -169,8 +203,10 @@ async function main() {
 
   // 1. Render at once from the computer. Nothing here waits for the network.
   let list = await loadBackgroundList(s);
-  const first = await localBackground(s, list, day);
+  const photo = { offset: await loadChoice(day), chosen: false };
+  const first = await localBackground(s, list, day + photo.offset);
   showPhoto(s, first.entry, first.src);
+  setupPhotoButtons(s, () => list, day, photo);
   await renderData(s, j);
   document.documentElement.dataset.renderedMs = String(Math.round(performance.now()));
 
@@ -181,12 +217,13 @@ async function main() {
     list = await loadBackgroundList(s);
   }
 
-  // 3. Fade in today's photo if it was not saved yet, then save the next days' photos.
-  if (!first.isToday) {
-    const today = await downloadToday(s, list, day);
-    if (today) showPhoto(s, today.entry, today.src);
+  // 3. Fade in the photo of today if it was not on the computer (unless the user chose one),
+  //    then save the photos of the next days.
+  if (!first.isToday && !photo.chosen) {
+    const today = await photoAt(s, list, day + photo.offset);
+    if (today && !photo.chosen) showPhoto(s, today.entry, today.src);
   }
-  await prefetchBackgrounds(s, list, day);
+  await prefetchBackgrounds(s, list, day + photo.offset);
 }
 
 main();
