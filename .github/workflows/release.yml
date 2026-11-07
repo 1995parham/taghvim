@@ -1,55 +1,128 @@
 name: release
 
-# Push a tag v<version> (the same as "version" in extension/manifest.json) to make a release.
+# Two kinds of release:
+# - Code release: push a tag v<version> (the same as "version" in extension/manifest.json).
+# - Data release: the data repository changed. It builds the code of the latest code release
+#   with the latest data. The version is <code release>.<run number>, for example 1.4.0.12,
+#   so no commit is necessary, and the next code release (for example 1.4.1) is higher.
+#   It starts in these ways:
+#     - the data repository sends a "data-updated" event after a push to its main branch,
+#     - every day at 03:17 UTC, if the data changed since the last release,
+#     - by hand: Actions > release > Run workflow.
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables), both optional:
+#   DATA_REPOSITORY  owner/repo of the data (default 1995parham/taghvim-data)
+#   DATA_BRANCH      branch of the data (default main)
+# Repository secrets, optional: AMO_JWT_ISSUER and AMO_JWT_SECRET to sign the Firefox add-on.
 on:
   push:
     tags: ["v*"]
+  repository_dispatch:
+    types: [data-updated]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      # Optional. With these secrets, the release also has a Firefox file signed by Mozilla.
+      DATA_REPOSITORY: ${{ vars.DATA_REPOSITORY || '1995parham/taghvim-data' }}
+      DATA_BRANCH: ${{ vars.DATA_BRANCH || 'main' }}
       AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
       AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # all tags, to find the latest code release
+
+      - name: Use the code of the latest code release (data release only)
+        id: code
+        if: github.ref_type != 'tag'
+        run: |
+          tag=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+          if [ -z "$tag" ]; then
+            echo "::notice::No code release yet. Push a tag v<version> first."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git checkout -q "$tag"
+          echo "Building the code of ${tag}."
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Check the version
-        id: version
-        run: |
-          version=$(node -p "require('./extension/manifest.json').version")
-          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
-            echo "::error::The tag ${GITHUB_REF_NAME} is not v${version} (extension/manifest.json)."
-            exit 1
-          fi
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
-
-      - name: Test
-        run: node --test 'tests/*.test.mjs'
-
-      - name: Get the latest data
+      - name: Get the data
+        if: steps.code.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
-          repository: 1995parham/taghvim-data
+          repository: ${{ env.DATA_REPOSITORY }}
+          ref: ${{ env.DATA_BRANCH }}
           path: data-repo
 
+      - name: Decide the version
+        id: version
+        if: steps.code.outputs.skip != 'true'
+        run: |
+          base=$(node -p "require('./extension/manifest.json').version")
+          data_commit=$(git -C data-repo rev-parse HEAD)
+          echo "data_commit=${data_commit}" >> "$GITHUB_OUTPUT"
+
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            if [ "v${base}" != "$GITHUB_REF_NAME" ]; then
+              echo "::error::The tag ${GITHUB_REF_NAME} is not v${base} (extension/manifest.json)."
+              exit 1
+            fi
+            echo "version=${base}" >> "$GITHUB_OUTPUT"
+            echo "kind=code" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # The data commit of the last release is in its notes: <!-- data-commit: <sha> -->
+          last=$(gh release view --json body -q .body 2>/dev/null | sed -n 's/.*data-commit: \([0-9a-f]*\).*/\1/p' | head -1)
+          if [ "$last" = "$data_commit" ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "The data did not change since the last release (${data_commit}). Nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "version=${base}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "kind=data" >> "$GITHUB_OUTPUT"
+
+      - name: Test
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
+        run: node --test 'tests/*.test.mjs'
+
       - name: Validate the data
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
         working-directory: data-repo
         run: node scripts/validate.mjs
 
       - name: Build
-        run: ./scripts/build.sh
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          # Data release: set the version in the package only (no commit).
+          node -e '
+            const fs = require("fs");
+            const m = JSON.parse(fs.readFileSync("extension/manifest.json", "utf8"));
+            m.version = process.env.VERSION;
+            fs.writeFileSync("extension/manifest.json", JSON.stringify(m, null, 2) + "\n");
+          '
+          ./scripts/build.sh
 
       - name: Sign for Firefox (unlisted)
-        if: env.AMO_JWT_ISSUER != '' && env.AMO_JWT_SECRET != ''
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true' && env.AMO_JWT_ISSUER != '' && env.AMO_JWT_SECRET != ''
         run: |
           npx --yes web-ext@8 sign \
             --source-dir extension \
@@ -61,10 +134,25 @@ jobs:
           rm -r dist/signed
 
       - name: Release
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          KIND: ${{ steps.version.outputs.kind }}
+          DATA_COMMIT: ${{ steps.version.outputs.data_commit }}
+          CODE_TAG: ${{ steps.code.outputs.tag }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/*.zip dist/*.xpi \
-            --verify-tag \
-            --title "Taghvim ${GITHUB_REF_NAME}" \
-            --generate-notes
+          short=${DATA_COMMIT:0:7}
+          data_link="https://github.com/${DATA_REPOSITORY}/commit/${DATA_COMMIT}"
+          if [ "$KIND" = "code" ]; then
+            gh release create "v${VERSION}" dist/*.zip dist/*.xpi \
+              --verify-tag --title "Taghvim ${VERSION}" --generate-notes
+            notes=$(gh release view "v${VERSION}" --json body -q .body)
+          else
+            gh release create "v${VERSION}" dist/*.zip dist/*.xpi \
+              --target "$(git rev-parse HEAD)" --title "Taghvim ${VERSION} (data update)" \
+              --notes "Data update: the code of ${CODE_TAG} with the latest data."
+            notes=$(gh release view "v${VERSION}" --json body -q .body)
+          fi
+          printf '%s\n\nData: [%s@%s](%s)\n\n<!-- data-commit: %s -->\n' \
+            "$notes" "$DATA_REPOSITORY" "$short" "$data_link" "$DATA_COMMIT" > notes.md
+          gh release edit "v${VERSION}" --notes-file notes.md
