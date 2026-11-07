@@ -1,9 +1,9 @@
 // Extra parts of the new tab page. calendar.js renders the calendar card.
 import { loadSettings } from '../lib/settings.js';
 import { todayJalali, toGregorian, toJalali, weekdaySat, jKey } from '../lib/jalali.js';
-import { loadYearIndex, loadHijri, loadBackgroundList, imageUrl, bundledUrl, pick } from '../lib/data.js';
+import { loadYearIndex, loadHijri, loadBackgroundList, syncFromGitHub, filesFor, imageUrl, bundledUrl, pick } from '../lib/data.js';
 import { toHijri } from '../lib/hijri.js';
-import { BUILTIN, resolveBackground, prefetchBackgrounds, dayNumber } from '../lib/backgrounds.js';
+import { BUILTIN, localBackground, downloadToday, prefetchBackgrounds, dayNumber } from '../lib/backgrounds.js';
 import { num, hijriLabel, JALALI_MONTHS, GREGORIAN_MONTHS, WEEKDAYS } from '../lib/i18n.js';
 
 const $ = (id) => document.getElementById(id);
@@ -65,13 +65,14 @@ function renderUpcoming(s, j, index) {
       if (src) {
         thumb = document.createElement('img');
         thumb.alt = '';
+        // The copy inside the extension first (fast, offline); a new image comes from GitHub.
         const local = bundledUrl(ev.image);
         const img = thumb;
         img.addEventListener('error', () => {
-          if (local && img.src !== local) img.src = local;
+          if (img.src !== src) img.src = src;
           else img.style.visibility = 'hidden';
         });
-        img.src = src;
+        img.src = local ?? src;
       } else {
         thumb = document.createElement('div');
         thumb.className = 'ph';
@@ -118,39 +119,74 @@ function renderLocation(s, entry) {
   document.querySelector('.location').hidden = !pick(entry.place, lang);
 }
 
-async function renderBackground(s) {
-  const list = await loadBackgroundList(s).catch(() => []);
-  const { entry, src } = await resolveBackground(s, list);
-  const img = $('bg-img');
+let latestPhoto = null;
+
+/**
+ * Shows a photo. A new photo fades in over the old one, then the old one is removed.
+ * Only the most recently requested photo stays, even if an older one loads later.
+ */
+function showPhoto(s, entry, src) {
+  const box = document.querySelector('.bg');
+  const img = document.createElement('img');
+  img.alt = '';
   img.style.objectPosition = entry.position ?? 'center';
-  img.addEventListener('load', () => img.classList.add('ready'), { once: true });
+  latestPhoto = img;
+  img.addEventListener('load', () => {
+    if (img !== latestPhoto) {
+      img.remove(); // a newer photo was requested
+      return;
+    }
+    img.classList.add('ready');
+    renderLocation(s, entry);
+    setTimeout(() => {
+      for (const old of box.querySelectorAll('img')) if (old !== latestPhoto) old.remove();
+    }, 500);
+  }, { once: true });
   img.addEventListener('error', () => {
+    img.remove();
     // A broken photo: use the photo inside the extension.
-    img.style.objectPosition = BUILTIN.position;
-    img.src = BUILTIN.src;
-    renderLocation(s, BUILTIN);
+    if (img === latestPhoto && entry !== BUILTIN) showPhoto(s, BUILTIN, BUILTIN.src);
   }, { once: true });
   img.src = src;
-  renderLocation(s, entry);
-  // Save the next days' photos for offline use, after the page is ready.
-  setTimeout(() => prefetchBackgrounds(s, list, dayNumber()), 3000);
+  box.append(img);
+}
+
+async function renderData(s, j) {
+  // The next 60 days can cross into the next Jalali year.
+  const [index, hijri] = await Promise.all([indexes(s, [j.jy, j.jy + 1]), loadHijri(s)]);
+  renderHero(s, j, index.get(jKey(j.jy, j.jm, j.jd)) ?? [], hijri);
+  renderUpcoming(s, j, index);
 }
 
 async function main() {
   const s = await loadSettings();
   document.title = s.lang === 'fa' ? 'زبانه جدید' : 'New Tab';
-  renderBackground(s);
   tickClock(s.lang);
   setInterval(() => tickClock(s.lang), 1000);
 
   const j = todayJalali();
-  // The next 60 days can cross into the next Jalali year.
-  const [index, hijri] = await Promise.all([
-    indexes(s, [j.jy, j.jy + 1]),
-    loadHijri(s).catch(() => null),
-  ]);
-  renderHero(s, j, index.get(jKey(j.jy, j.jm, j.jd)) ?? [], hijri);
-  renderUpcoming(s, j, index);
+  const day = dayNumber();
+
+  // 1. Render at once from the computer. Nothing here waits for the network.
+  let list = await loadBackgroundList(s);
+  const first = await localBackground(s, list, day);
+  showPhoto(s, first.entry, first.src);
+  await renderData(s, j);
+  document.documentElement.dataset.renderedMs = String(Math.round(performance.now()));
+
+  // 2. Then check GitHub, and render again only if the data changed.
+  if (await syncFromGitHub(s, filesFor([j.jy, j.jy + 1]))) {
+    await renderData(s, j);
+    window.dispatchEvent(new CustomEvent('taghvim:data-changed'));
+    list = await loadBackgroundList(s);
+  }
+
+  // 3. Fade in today's photo if it was not saved yet, then save the next days' photos.
+  if (!first.isToday) {
+    const today = await downloadToday(s, list, day);
+    if (today) showPhoto(s, today.entry, today.src);
+  }
+  await prefetchBackgrounds(s, list, day);
 }
 
 main();
