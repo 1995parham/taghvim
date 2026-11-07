@@ -1,4 +1,4 @@
-// Run: node --test tests/
+// Run: node --test 'tests/*.test.mjs'
 // Compares the conversion with the ICU Persian calendar for every day from 1950 to 2100.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -33,7 +33,7 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
 
       - name: Test
-        run: node --test tests/
+        run: node --test 'tests/*.test.mjs'
 
       - name: Get the latest data
         uses: actions/checkout@v4

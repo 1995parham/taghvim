@@ -27,7 +27,7 @@ data-repo/            the data repository (a separate git repository, not part o
 scripts/build.sh      makes the store packages in dist/ (it runs scripts/sync-data.sh first)
 scripts/sync-data.sh  copies the data repository into extension/data/ for offline use
 scripts/make-icons.mjs
-tests/                node --test tests/ ; tests/preview.html is a page preview without a browser install
+tests/                node --test 'tests/*.test.mjs' ; tests/preview.html is a page preview without a browser install
 ```
 
 ## Data repository
@@ -36,7 +36,7 @@ The data is in a separate public repository, [1995parham/taghvim-data](https://g
 
 ## Development
 
-1. Run the tests: `node --test tests/`
+1. Run the tests: `node --test 'tests/*.test.mjs'`
 2. Preview the new tab page: run `python3 -m http.server 8000` in the project root, then open `http://localhost:8000/tests/preview.html?lang=fa&date=2026-03-21`. The preview uses the local `data-repo/` folder.
 
 ## Install
