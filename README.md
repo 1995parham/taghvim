@@ -26,7 +26,7 @@ Taghvim replaces the new tab page of Chrome, Edge, Firefox and Safari. It shows 
 
 ## ✨ Features
 
-- 🗓️ **Three calendars at once**: a clock, today's Jalali, Gregorian and Hijri date, the events of today, and the events of the next 60 days.
+- 🗓️ **Three calendars at once**: a clock with the system time zone, today's Jalali, Gregorian and Hijri date, the events of today, and the events of the next 60 days.
 - 📅 **A Jalali month view** where each day also shows its Gregorian day number. The week starts on Saturday, and Fridays and holidays show in red.
 - 🔎 **A details panel** with the full Jalali and Gregorian date and the events of the selected day. Each event has a title, a description of one or two lines, and an optional image.
 - 🏞️ **A different photo each day**, with its location and a short description written over it. The ‹ › buttons change the photo, and the choice stays for the rest of the day.

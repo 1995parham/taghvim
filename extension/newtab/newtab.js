@@ -16,6 +16,18 @@ function tickClock(lang) {
   const hh = String(now.getHours()).padStart(2, '0');
   const mm = String(now.getMinutes()).padStart(2, '0');
   $('clock').textContent = num(`${hh}:${mm}`, lang);
+  $('clock-tz').textContent = timeZoneLabel(now, lang);
+}
+
+// The system time zone, for example "Europe/Madrid · UTC+1". The offset is read on each
+// tick, so it follows daylight saving time and a change of the system time zone.
+function timeZoneLabel(now, lang) {
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  const off = -now.getTimezoneOffset();
+  const h = Math.floor(Math.abs(off) / 60);
+  const m = Math.abs(off) % 60;
+  const utc = `UTC${off < 0 ? '−' : '+'}${h}${m ? `:${String(m).padStart(2, '0')}` : ''}`;
+  return num([zone.replaceAll('_', ' '), utc].filter(Boolean).join(' · '), lang);
 }
 
 async function indexes(s, years) {

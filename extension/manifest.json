@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Taghvim — Jalali & Gregorian New Tab",
   "short_name": "Taghvim",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A new tab page with the Jalali and Gregorian calendars, and holidays with descriptions and images from a public GitHub repository.",
   "permissions": [
     "storage"
