@@ -7,6 +7,8 @@ export const DEFAULTS = Object.freeze({
   repo: 'taghvim-data',
   branch: 'main',
   lang: 'fa',
+  search: 'google', // a key of ENGINES in search.js, or 'none'
+  topSites: false, // show the most visited sites (needs the optional topSites permission)
 });
 
 let defaults = null;

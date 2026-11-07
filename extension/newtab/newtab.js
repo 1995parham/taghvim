@@ -1,5 +1,6 @@
 // Extra parts of the new tab page. calendar.js renders the calendar card.
-import { loadSettings } from '../lib/settings.js';
+import { api, loadSettings } from '../lib/settings.js';
+import { ENGINES, searchUrl } from '../lib/search.js';
 import { todayJalali, toGregorian, toJalali, weekdaySat, jKey } from '../lib/jalali.js';
 import { loadYearIndex, loadHijri, loadBackgroundList, syncFromGitHub, filesFor, imageUrl, bundledUrl, pick } from '../lib/data.js';
 import { toHijri } from '../lib/hijri.js';
@@ -161,6 +162,57 @@ async function renderData(s, j) {
   renderUpcoming(s, j, index);
 }
 
+function renderSearch(s) {
+  const engine = ENGINES[s.search];
+  if (!engine) return; // 'none' or unknown: keep it hidden
+  const form = $('search');
+  const input = $('q');
+  input.placeholder = `${t(s.lang, 'searchWith')} ${engine.name}`;
+  form.hidden = false;
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const q = input.value.trim();
+    if (q) location.href = searchUrl(s.search, q);
+  });
+}
+
+/** The most visited sites. Shown only if the setting is on and the browser gave the permission. */
+async function renderTopSites(s) {
+  if (!s.topSites || !api.permissions) return;
+  try {
+    if (!(await api.permissions.contains({ permissions: ['topSites'] })) || !api.topSites) return;
+    // Firefox accepts options (and gives favicons); Chrome takes no options.
+    const isFirefox = typeof globalThis.browser !== 'undefined';
+    const sites = (await (isFirefox ? api.topSites.get({ limit: 8, includeFavicon: true }) : api.topSites.get())).slice(0, 8);
+    const nav = $('sites');
+    nav.replaceChildren(...sites.filter((x) => /^https?:/.test(x.url)).map((x) => {
+      const host = new URL(x.url).hostname.replace(/^www\./, '');
+      const a = document.createElement('a');
+      a.className = 'site';
+      a.href = x.url;
+      a.title = x.title || host;
+      const icon = document.createElement('span');
+      icon.className = 'site-icon';
+      if (x.favicon) {
+        const img = document.createElement('img');
+        img.alt = '';
+        img.src = x.favicon;
+        icon.append(img);
+      } else {
+        icon.textContent = host.charAt(0).toUpperCase();
+      }
+      const name = document.createElement('span');
+      name.className = 'site-name';
+      name.textContent = host;
+      a.append(icon, name);
+      return a;
+    }));
+    nav.hidden = !nav.children.length;
+  } catch {
+    // No permission or no API (Safari): show nothing.
+  }
+}
+
 /** The ‹ › buttons. getList() returns the current photo list (it can change after a sync). */
 function setupPhotoButtons(s, getList, day, photo) {
   $('bg-prev').title = t(s.lang, 'prevPhoto');
@@ -207,7 +259,9 @@ async function main() {
   const first = await localBackground(s, list, day + photo.offset);
   showPhoto(s, first.entry, first.src);
   setupPhotoButtons(s, () => list, day, photo);
+  renderSearch(s);
   await renderData(s, j);
+  renderTopSites(s);
   document.documentElement.dataset.renderedMs = String(Math.round(performance.now()));
 
   // 2. Then check GitHub, and render again only if the data changed.

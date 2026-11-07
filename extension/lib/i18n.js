@@ -41,6 +41,7 @@ const STRINGS = {
     source: 'منبع داده',
     prevPhoto: 'عکس قبلی',
     nextPhoto: 'عکس بعدی',
+    searchWith: 'جستجو با',
   },
   en: {
     today: 'Today',
@@ -54,6 +55,7 @@ const STRINGS = {
     source: 'Data source',
     prevPhoto: 'Previous photo',
     nextPhoto: 'Next photo',
+    searchWith: 'Search with',
   },
 };
 

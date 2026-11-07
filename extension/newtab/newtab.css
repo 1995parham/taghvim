@@ -2,9 +2,10 @@
 html, body { min-height: 100%; }
 body {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 32px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 16px;
   background: #1d1a22;
 }
 
@@ -20,6 +21,7 @@ body {
 }
 
 .layout {
+  margin: auto 0; /* centered in the free height; the location stays below it */
   display: grid;
   grid-template-columns: minmax(0, 1fr) 400px;
   gap: 48px;
@@ -65,6 +67,52 @@ body {
 }
 .chip.holiday { background: rgb(217 48 37 / 0.85); }
 
+.search { margin-top: 24px; max-width: 520px; }
+.search input {
+  width: 100%;
+  padding: 12px 18px;
+  font: inherit;
+  font-size: 15px;
+  color: #fff;
+  background: rgb(20 16 28 / 0.5);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 999px;
+  outline: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  text-shadow: none;
+}
+.search input::placeholder { color: rgb(255 255 255 / 0.65); }
+.search input:focus { border-color: rgb(255 255 255 / 0.6); background: rgb(20 16 28 / 0.65); }
+
+.sites { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; max-width: 520px; text-shadow: none; }
+.site {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 64px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 11px;
+}
+.site-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgb(20 16 28 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  font-size: 18px;
+  font-weight: 700;
+}
+.site-icon img { width: 22px; height: 22px; }
+.site:hover .site-icon { background: rgb(20 16 28 / 0.75); }
+.site-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; }
+
 .section-title { margin: 36px 0 10px; font-size: 14px; font-weight: 700; opacity: 0.85; }
 
 .upcoming { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-width: 520px; text-shadow: none; }
@@ -88,25 +136,33 @@ body {
 .upcoming .left { white-space: nowrap; }
 
 .location {
+  /* Bottom of the end side (right in English, left in Persian): under the calendar card,
+     which is shorter than the other column, so it does not cover the events. */
   position: fixed;
-  right: 20px;
   bottom: 16px;
+  inset-inline-end: 20px;
   margin: 0;
-  text-align: right;
+  text-align: end;
   color: #fff;
   text-shadow: 0 1px 8px rgb(0 0 0 / 0.7);
+}
+/* A short or narrow window: put it in the page flow, below the content. */
+@media (max-height: 759px), (max-width: 860px) {
+  .location { position: static; align-self: flex-end; margin: 24px 4px 0; }
 }
 .loc-place { font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .pin { font-size: 14px; }
 .loc-region { font-size: 13px; opacity: 0.85; }
 .loc-desc {
   max-width: 380px;
-  margin: 4px 0 0 auto;
+  margin: 4px 0 0;
+  margin-inline-start: auto;
   font-size: 12px;
   line-height: 1.6;
   opacity: 0.9;
 }
 .loc-nav { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 8px; }
+html[dir="rtl"] .loc-nav { justify-content: flex-start; } /* the nav is LTR; keep it on the text side */
 .loc-btn {
   width: 30px;
   height: 30px;
@@ -125,4 +181,3 @@ body {
 .loc-btn:disabled { opacity: 0.5; cursor: progress; }
 .loc-credit { display: inline-block; margin-top: 2px; font-size: 10px; color: rgb(255 255 255 / 0.6); text-decoration: none; }
 .loc-credit:hover { color: #fff; text-decoration: underline; }
-@media (max-width: 860px) { .location { position: static; margin-top: 24px; justify-self: end; } }
