@@ -1,0 +1,116 @@
+{
+  "$schema": "./schema.json",
+  "events": [
+    {
+      "id": "nowruz-1",
+      "jalali": "01-01",
+      "holiday": true,
+      "title": { "fa": "جشن نوروز", "en": "Nowruz" },
+      "description": {
+        "fa": "آغاز سال نو خورشیدی و فصل بهار؛ کهن‌ترین جشن ایرانی.",
+        "en": "The Persian New Year and the first day of spring."
+      },
+      "image": "images/nowruz.svg"
+    },
+    {
+      "id": "nowruz-2",
+      "jalali": "01-02",
+      "holiday": true,
+      "title": { "fa": "عید نوروز", "en": "Nowruz holiday" },
+      "description": { "fa": "دومین روز تعطیلات نوروز.", "en": "The second day of the Nowruz holidays." },
+      "image": "images/nowruz.svg"
+    },
+    {
+      "id": "nowruz-3",
+      "jalali": "01-03",
+      "holiday": true,
+      "title": { "fa": "عید نوروز", "en": "Nowruz holiday" },
+      "description": { "fa": "سومین روز تعطیلات نوروز.", "en": "The third day of the Nowruz holidays." },
+      "image": "images/nowruz.svg"
+    },
+    {
+      "id": "nowruz-4",
+      "jalali": "01-04",
+      "holiday": true,
+      "title": { "fa": "عید نوروز", "en": "Nowruz holiday" },
+      "description": { "fa": "چهارمین روز تعطیلات نوروز.", "en": "The fourth day of the Nowruz holidays." },
+      "image": "images/nowruz.svg"
+    },
+    {
+      "id": "islamic-republic-day",
+      "jalali": "01-12",
+      "holiday": true,
+      "title": { "fa": "روز جمهوری اسلامی", "en": "Islamic Republic Day" },
+      "description": { "fa": "سالروز همه‌پرسی سال ۱۳۵۸.", "en": "The anniversary of the 1979 referendum." }
+    },
+    {
+      "id": "sizdah-bedar",
+      "jalali": "01-13",
+      "holiday": true,
+      "title": { "fa": "روز طبیعت (سیزده‌بدر)", "en": "Nature Day (Sizdah Bedar)" },
+      "description": {
+        "fa": "پایان جشن‌های نوروزی؛ مردم روز را در طبیعت می‌گذرانند.",
+        "en": "The last day of Nowruz. People spend the day outdoors."
+      },
+      "image": "images/sizdah-bedar.svg"
+    },
+    {
+      "id": "khomeini-death",
+      "jalali": "03-14",
+      "holiday": true,
+      "title": { "fa": "رحلت امام خمینی", "en": "Death of Ayatollah Khomeini" },
+      "description": { "fa": "سالروز درگذشت بنیان‌گذار جمهوری اسلامی (۱۳۶۸).", "en": "The anniversary of the death of Khomeini (1989)." }
+    },
+    {
+      "id": "khordad-15",
+      "jalali": "03-15",
+      "holiday": true,
+      "title": { "fa": "قیام ۱۵ خرداد", "en": "15 Khordad Uprising" },
+      "description": { "fa": "سالروز قیام ۱۵ خرداد ۱۳۴۲.", "en": "The anniversary of the 1963 uprising." }
+    },
+    {
+      "id": "yalda",
+      "jalali": "09-30",
+      "holiday": false,
+      "title": { "fa": "شب یلدا", "en": "Yalda Night" },
+      "description": {
+        "fa": "بلندترین شب سال؛ خانواده‌ها با انار، هندوانه و شعر حافظ دور هم جمع می‌شوند.",
+        "en": "The longest night of the year, with pomegranates, watermelon, and Hafez poetry."
+      },
+      "image": "images/yalda.svg"
+    },
+    {
+      "id": "revolution-day",
+      "jalali": "11-22",
+      "holiday": true,
+      "title": { "fa": "پیروزی انقلاب اسلامی", "en": "Islamic Revolution Victory Day" },
+      "description": { "fa": "سالروز پیروزی انقلاب در ۲۲ بهمن ۱۳۵۷.", "en": "The anniversary of the 1979 revolution." }
+    },
+    {
+      "id": "oil-nationalization",
+      "jalali": "12-29",
+      "holiday": true,
+      "title": { "fa": "ملی شدن صنعت نفت", "en": "Oil Nationalization Day" },
+      "description": { "fa": "سالروز ملی شدن صنعت نفت ایران در سال ۱۳۲۹.", "en": "The anniversary of the 1951 oil nationalization." }
+    },
+    {
+      "id": "christmas",
+      "gregorian": "12-25",
+      "holiday": true,
+      "title": { "fa": "کریسمس", "en": "Christmas Day" },
+      "description": {
+        "fa": "جشن میلاد مسیح در تقویم میلادی.",
+        "en": "The Christian celebration of the birth of Jesus."
+      },
+      "image": "images/christmas.svg"
+    },
+    {
+      "id": "new-year",
+      "gregorian": "01-01",
+      "holiday": true,
+      "title": { "fa": "آغاز سال نو میلادی", "en": "New Year's Day" },
+      "description": { "fa": "نخستین روز سال میلادی.", "en": "The first day of the Gregorian year." },
+      "image": "images/new-year.svg"
+    }
+  ]
+}

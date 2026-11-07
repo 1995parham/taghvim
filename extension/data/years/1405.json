@@ -1,0 +1,16 @@
+{
+  "$schema": "../schema.json",
+  "year": 1405,
+  "events": [
+    {
+      "id": "world-cup-final-2026",
+      "gregorian": "2026-07-19",
+      "holiday": false,
+      "title": { "fa": "فینال جام جهانی ۲۰۲۶", "en": "2026 FIFA World Cup final" },
+      "description": {
+        "fa": "نمونه‌ای از رویداد یک‌باره با تاریخ میلادی.",
+        "en": "An example of a one-off event with a Gregorian date."
+      }
+    }
+  ]
+}
