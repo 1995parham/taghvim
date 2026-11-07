@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+env:
+  DATA_REPOSITORY: ${{ vars.DATA_REPOSITORY || '1995parham/taghvim-data' }}
+  DATA_BRANCH: ${{ vars.DATA_BRANCH || 'main' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +28,8 @@ jobs:
       - name: Get the latest data
         uses: actions/checkout@v4
         with:
-          repository: 1995parham/taghvim-data
+          repository: ${{ env.DATA_REPOSITORY }}
+          ref: ${{ env.DATA_BRANCH }}
           path: data-repo
 
       - name: Validate the data
