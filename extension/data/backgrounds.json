@@ -1,0 +1,67 @@
+{
+  "backgrounds": [
+    {
+      "id": "badalona-pont-del-petroli-sunset",
+      "image": "backgrounds/badalona-pont-del-petroli-sunset.jpg",
+      "position": "center 40%",
+      "place": { "fa": "پونت دل پترولی (اسکله نفت)", "en": "Pont del Petroli" },
+      "region": { "fa": "بادالونا، کاتالونیا، اسپانیا", "en": "Badalona, Catalonia, Spain" },
+      "credit": "Photo: Enric · CC BY-SA 4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg"
+    },
+    {
+      "id": "isfahan-naqsh-e-jahan",
+      "image": "backgrounds/isfahan-naqsh-e-jahan.jpg",
+      "position": "center 45%",
+      "place": { "fa": "میدان نقش جهان، از طاق سردر قیصریه", "en": "Naqsh-e Jahan Square, from the Qeysarieh Gate" },
+      "region": { "fa": "اصفهان، ایران", "en": "Isfahan, Iran" },
+      "credit": "Photo: Amir Pashaei · CC BY-SA 4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Naqsh-e_Jahan_Square_from_the_gheisariye_Vault.jpg"
+    },
+    {
+      "id": "yazd-jameh-mosque",
+      "image": "backgrounds/yazd-jameh-mosque.jpg",
+      "position": "center 35%",
+      "place": { "fa": "مسجد جامع یزد و بقعه سید رکن‌الدین", "en": "Jameh Mosque and Rokn al-Din Mausoleum" },
+      "region": { "fa": "یزد، ایران", "en": "Yazd, Iran" },
+      "credit": "Photo: Ggia · CC BY-SA 3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:20110103_Jame-e_Kabir_and_Roknedin_Mauseleum_Yazd_Iran.jpg"
+    },
+    {
+      "id": "badalona-pont-del-petroli-clouds",
+      "image": "backgrounds/badalona-pont-del-petroli-clouds.jpg",
+      "position": "center 45%",
+      "place": { "fa": "پونت دل پترولی (اسکله نفت)", "en": "Pont del Petroli" },
+      "region": { "fa": "بادالونا، کاتالونیا، اسپانیا", "en": "Badalona, Catalonia, Spain" },
+      "credit": "Photo: Carquinyol · CC BY-SA 2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:N%C3%BAvols,_mar_i_pont_(32212714692).jpg"
+    },
+    {
+      "id": "isfahan-si-o-se-pol",
+      "image": "backgrounds/isfahan-si-o-se-pol.jpg",
+      "position": "center",
+      "place": { "fa": "سی‌وسه‌پل", "en": "Si-o-se-pol" },
+      "region": { "fa": "اصفهان، ایران", "en": "Isfahan, Iran" },
+      "credit": "Photo: Reza Haji-pour · CC BY 3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Si-o-se-Pol.jpg"
+    },
+    {
+      "id": "kashan-borujerdi-house",
+      "image": "backgrounds/kashan-borujerdi-house.jpg",
+      "position": "center",
+      "place": { "fa": "خانه بروجردی‌ها", "en": "Borujerdi House" },
+      "region": { "fa": "کاشان، ایران", "en": "Kashan, Iran" },
+      "credit": "Photo: Amir Pashaei · CC BY-SA 4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Borujerdi_House_Kashan_Iran.jpg"
+    },
+    {
+      "id": "persepolis",
+      "image": "backgrounds/persepolis.jpg",
+      "position": "center",
+      "place": { "fa": "تخت جمشید", "en": "Persepolis" },
+      "region": { "fa": "مرودشت، فارس، ایران", "en": "Marvdasht, Fars, Iran" },
+      "credit": "Photo: Diego Delso · CC BY-SA 4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Pers%C3%A9polis,_Ir%C3%A1n,_2016-09-24,_DD_15.jpg"
+    }
+  ]
+}
