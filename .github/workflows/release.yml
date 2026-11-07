@@ -14,6 +14,9 @@ name: release
 #   DATA_REPOSITORY  owner/repo of the data (default 1995parham/taghvim-data)
 #   DATA_BRANCH      branch of the data (default main)
 # Repository secrets, optional: AMO_JWT_ISSUER and AMO_JWT_SECRET to sign the Firefox add-on.
+#
+# Each release has updates.json. Installed Firefox add-ons read it from the latest release
+# (gecko.update_url) and update themselves.
 on:
   push:
     tags: ["v*"]
@@ -112,11 +115,14 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          # Data release: set the version in the package only (no commit).
+          # Set the version (data release: in the package only, no commit) and the Firefox
+          # update URL of this repository (also correct for forks and for older code tags).
           node -e '
             const fs = require("fs");
             const m = JSON.parse(fs.readFileSync("extension/manifest.json", "utf8"));
             m.version = process.env.VERSION;
+            m.browser_specific_settings.gecko.update_url =
+              `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/latest/download/updates.json`;
             fs.writeFileSync("extension/manifest.json", JSON.stringify(m, null, 2) + "\n");
           '
           ./scripts/build.sh
@@ -133,6 +139,30 @@ jobs:
           mv dist/signed/*.xpi "dist/taghvim-${{ steps.version.outputs.version }}-signed.xpi"
           rm -r dist/signed
 
+      - name: Firefox update manifest
+        if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          # Firefox reads updates.json from the latest release (update_url in the manifest)
+          # and installs the .xpi if its version is higher. Prefer the file signed by Mozilla.
+          file="taghvim-${VERSION}-signed.xpi"
+          [ -f "dist/${file}" ] || file="taghvim-${VERSION}.xpi"
+          export FILE="$file"
+          export HASH="sha256:$(sha256sum "dist/${file}" | cut -d' ' -f1)"
+          node -e '
+            const fs = require("fs");
+            const m = JSON.parse(fs.readFileSync("extension/manifest.json", "utf8"));
+            const { VERSION, FILE, HASH, GITHUB_REPOSITORY } = process.env;
+            const updates = { addons: { [m.browser_specific_settings.gecko.id]: { updates: [{
+              version: VERSION,
+              update_link: `https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/${FILE}`,
+              update_hash: HASH,
+            }] } } };
+            fs.writeFileSync("dist/updates.json", JSON.stringify(updates, null, 2) + "\n");
+          '
+          cat dist/updates.json
+
       - name: Release
         if: steps.code.outputs.skip != 'true' && steps.version.outputs.skip != 'true'
         env:
@@ -144,12 +174,12 @@ jobs:
           short=${DATA_COMMIT:0:7}
           data_link="https://github.com/${DATA_REPOSITORY}/commit/${DATA_COMMIT}"
           if [ "$KIND" = "code" ]; then
-            gh release create "v${VERSION}" dist/*.zip dist/*.xpi \
-              --verify-tag --title "Taghvim ${VERSION}" --generate-notes
+            gh release create "v${VERSION}" dist/*.zip dist/*.xpi dist/updates.json \
+              --verify-tag --latest --title "Taghvim ${VERSION}" --generate-notes
             notes=$(gh release view "v${VERSION}" --json body -q .body)
           else
-            gh release create "v${VERSION}" dist/*.zip dist/*.xpi \
-              --target "$(git rev-parse HEAD)" --title "Taghvim ${VERSION} (data update)" \
+            gh release create "v${VERSION}" dist/*.zip dist/*.xpi dist/updates.json \
+              --latest --target "$(git rev-parse HEAD)" --title "Taghvim ${VERSION} (data update)" \
               --notes "Data update: the code of ${CODE_TAG} with the latest data."
             notes=$(gh release view "v${VERSION}" --json body -q .body)
           fi
