@@ -3,7 +3,7 @@
   "backgrounds": [
     {
       "id": "badalona-pont-del-petroli-sunset",
-      "image": "backgrounds/badalona-pont-del-petroli-sunset.jpg",
+      "image": "backgrounds/badalona-pont-del-petroli-sunset.webp",
       "position": "center 40%",
       "place": {
         "fa": "پونت دل پترولی (اسکله نفت)",
@@ -13,12 +13,16 @@
         "fa": "بادالونا، کاتالونیا، اسپانیا",
         "en": "Badalona, Catalonia, Spain"
       },
+      "description": {
+        "fa": "غروب ساحل استاسیون بادالونا؛ اسکله‌ی قدیمی بارگیری نفت امروز گذرگاهی برای قدم زدن روی دریاست.",
+        "en": "Sunset at Platja de l'Estació. The old oil-loading pier is now a walkway over the sea."
+      },
       "credit": "Photo: Enric · CC BY-SA 4.0",
       "source": "https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg"
     },
     {
       "id": "isfahan-naqsh-e-jahan",
-      "image": "backgrounds/isfahan-naqsh-e-jahan.jpg",
+      "image": "backgrounds/isfahan-naqsh-e-jahan.webp",
       "position": "center 45%",
       "place": {
         "fa": "میدان نقش جهان، از طاق سردر قیصریه",
@@ -28,12 +32,16 @@
         "fa": "اصفهان، ایران",
         "en": "Isfahan, Iran"
       },
+      "description": {
+        "fa": "میدان نقش جهان از زیر طاق مقرنس سردر قیصریه، با مسجد امام در انتهای میدان.",
+        "en": "Naqsh-e Jahan Square through the muqarnas arch of the Qeysarieh Gate, with the Shah Mosque at the far end."
+      },
       "credit": "Photo: Amir Pashaei · CC BY-SA 4.0",
       "source": "https://commons.wikimedia.org/wiki/File:Naqsh-e_Jahan_Square_from_the_gheisariye_Vault.jpg"
     },
     {
       "id": "yazd-jameh-mosque",
-      "image": "backgrounds/yazd-jameh-mosque.jpg",
+      "image": "backgrounds/yazd-jameh-mosque.webp",
       "position": "center 35%",
       "place": {
         "fa": "مسجد جامع یزد و بقعه سید رکن‌الدین",
@@ -43,12 +51,16 @@
         "fa": "یزد، ایران",
         "en": "Yazd, Iran"
       },
+      "description": {
+        "fa": "گنبد کاشی‌کاری بقعه‌ی سید رکن‌الدین و مناره‌های مسجد جامع یزد در نور عصر.",
+        "en": "The tiled dome of the Rokn al-Din Mausoleum and the minarets of the Jameh Mosque in the late-afternoon light."
+      },
       "credit": "Photo: Ggia · CC BY-SA 3.0",
       "source": "https://commons.wikimedia.org/wiki/File:20110103_Jame-e_Kabir_and_Roknedin_Mauseleum_Yazd_Iran.jpg"
     },
     {
       "id": "badalona-pont-del-petroli-clouds",
-      "image": "backgrounds/badalona-pont-del-petroli-clouds.jpg",
+      "image": "backgrounds/badalona-pont-del-petroli-clouds.webp",
       "position": "center 45%",
       "place": {
         "fa": "پونت دل پترولی (اسکله نفت)",
@@ -58,12 +70,16 @@
         "fa": "بادالونا، کاتالونیا، اسپانیا",
         "en": "Badalona, Catalonia, Spain"
       },
+      "description": {
+        "fa": "خورشید از پشت ابرها بر اسکله‌ی پونت دل پترولی و موج‌های دریای مدیترانه می‌تابد.",
+        "en": "The sun breaks through the clouds over the Pont del Petroli and the waves of the Mediterranean."
+      },
       "credit": "Photo: Carquinyol · CC BY-SA 2.0",
       "source": "https://commons.wikimedia.org/wiki/File:N%C3%BAvols,_mar_i_pont_(32212714692).jpg"
     },
     {
       "id": "isfahan-si-o-se-pol",
-      "image": "backgrounds/isfahan-si-o-se-pol.jpg",
+      "image": "backgrounds/isfahan-si-o-se-pol.webp",
       "position": "center",
       "place": {
         "fa": "سی‌وسه‌پل",
@@ -73,12 +89,16 @@
         "fa": "اصفهان، ایران",
         "en": "Isfahan, Iran"
       },
+      "description": {
+        "fa": "طاق‌های روشن سی‌وسه‌پل در شب و بازتاب آن‌ها در آب زاینده‌رود.",
+        "en": "The lit arches of the Si-o-se-pol bridge at night, reflected in the Zayanderud river."
+      },
       "credit": "Photo: Reza Haji-pour · CC BY 3.0",
       "source": "https://commons.wikimedia.org/wiki/File:Si-o-se-Pol.jpg"
     },
     {
       "id": "kashan-borujerdi-house",
-      "image": "backgrounds/kashan-borujerdi-house.jpg",
+      "image": "backgrounds/kashan-borujerdi-house.webp",
       "position": "center",
       "place": {
         "fa": "خانه بروجردی‌ها",
@@ -88,12 +108,16 @@
         "fa": "کاشان، ایران",
         "en": "Kashan, Iran"
       },
+      "description": {
+        "fa": "تالار اصلی خانه‌ی بروجردی‌ها، خانه‌ای تاریخی از دوره‌ی قاجار با گچ‌بری و نقاشی‌های دیواری.",
+        "en": "The main hall of the Borujerdi House, a Qajar-era house with stucco work and wall paintings."
+      },
       "credit": "Photo: Amir Pashaei · CC BY-SA 4.0",
       "source": "https://commons.wikimedia.org/wiki/File:Borujerdi_House_Kashan_Iran.jpg"
     },
     {
       "id": "persepolis",
-      "image": "backgrounds/persepolis.jpg",
+      "image": "backgrounds/persepolis.webp",
       "position": "center",
       "place": {
         "fa": "تخت جمشید",
@@ -103,8 +127,31 @@
         "fa": "مرودشت، فارس، ایران",
         "en": "Marvdasht, Fars, Iran"
       },
+      "description": {
+        "fa": "نقش برجسته‌ی سربازان هخامنشی بر دیوارهای تخت جمشید.",
+        "en": "A relief of Achaemenid guards on a wall at Persepolis."
+      },
       "credit": "Photo: Diego Delso · CC BY-SA 4.0",
       "source": "https://commons.wikimedia.org/wiki/File:Pers%C3%A9polis,_Ir%C3%A1n,_2016-09-24,_DD_15.jpg"
+    },
+    {
+      "id": "roudehen-first-anniversary",
+      "image": "backgrounds/roudehen-first-anniversary.webp",
+      "position": "center 35%",
+      "place": {
+        "fa": "جشن یکسالگی پرهام و الهه",
+        "en": "Parham & Elaheh's first anniversary"
+      },
+      "region": {
+        "fa": "مهرآباد، رودهن، استان تهران، ایران",
+        "en": "Mehrabad, Roudehen, Tehran Province, Iran"
+      },
+      "description": {
+        "fa": "الهه در جشن یکسالگی ازدواجمان، پنجشنبه ۲۲ خرداد ۱۴۰۴، در فولکس قورباغه‌ای صورتی که با گل آراسته شده بود.",
+        "en": "Elaheh at our first wedding anniversary party on Thursday, 12 June 2025, in a pink VW Beetle decorated with flowers."
+      },
+      "credit": "Photo: Parham & Elaheh's collection · Unlicense",
+      "source": "https://github.com/parham-alvani/browser-wallpapers/blob/main/chrome/elahe.jpg"
     }
   ]
 }

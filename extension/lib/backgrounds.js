@@ -18,7 +18,7 @@ const CHOICE_KEY = 'background-choice';
 
 export const BUILTIN = Object.freeze({
   id: 'builtin',
-  src: '../data/backgrounds/badalona-pont-del-petroli-sunset.jpg',
+  src: '../data/backgrounds/badalona-pont-del-petroli-sunset.webp',
   position: 'center 40%',
   place: { fa: 'پونت دل پترولی (اسکله نفت)', en: 'Pont del Petroli' },
   region: { fa: 'بادالونا، کاتالونیا، اسپانیا', en: 'Badalona, Catalonia, Spain' },
