@@ -6,13 +6,15 @@
 // - The page never waits for the network for the first photo (localBackground):
 //   today's photo from the extension or the cache, else the closest earlier day's photo,
 //   else the built-in photo.
-// - If today's photo is new (not in the build, not saved yet), downloadToday() gets it in the
+// - If today's photo is new (not in the build, not saved yet), photoAt() downloads it in the
 //   background, and the page fades it in.
 
+import { api } from './settings.js';
 import { imageUrl, bundledUrl, bundledBackgroundImages } from './data.js';
 
 const CACHE_NAME = 'taghvim-backgrounds-v1';
 const PREFETCH_DAYS = 3; // save the photos of the next days for offline use
+const CHOICE_KEY = 'background-choice';
 
 export const BUILTIN = Object.freeze({
   id: 'builtin',
@@ -23,6 +25,23 @@ export const BUILTIN = Object.freeze({
   credit: 'Photo: Enric · CC BY-SA 4.0',
   source: 'https://commons.wikimedia.org/wiki/File:01_Platja_de_l%27Estaci%C3%B3_al_capvespre_(Badalona),_al_fons_el_pont_del_Petroli.jpg',
 });
+
+/**
+ * The ‹ › buttons move the photo by an offset from today's photo. The offset stays for the
+ * rest of the day (also in new tabs); the next day starts again at 0.
+ */
+export async function loadChoice(day) {
+  try {
+    const c = (await api.storage.local.get(CHOICE_KEY))[CHOICE_KEY];
+    return c?.day === day && Number.isInteger(c.offset) ? c.offset : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function saveChoice(day, offset) {
+  await api.storage.local.set({ [CHOICE_KEY]: { day, offset } });
+}
 
 /** Days since 1970-01-01 for the local calendar day. */
 export function dayNumber(date = new Date()) {
@@ -71,18 +90,19 @@ export async function localBackground(s, list, day = dayNumber()) {
   return { entry: BUILTIN, src: BUILTIN.src, isToday: false };
 }
 
-/** Downloads and saves today's photo. Returns { entry, src } or null (offline, error). */
-export async function downloadToday(s, list, day = dayNumber()) {
+/**
+ * The photo at a position of the list: from the extension, else from the cache, else downloaded.
+ * Returns { entry, src } or null (not on the computer and the download failed).
+ */
+export async function photoAt(s, list, index) {
   if (!Array.isArray(list) || !list.length) return null;
-  const entry = entryFor(list, day);
+  const entry = entryFor(list, index);
+  const [cache, bundled] = await Promise.all([openCache(), bundledBackgroundImages()]);
+  if (bundled.has(entry.image)) return { entry, src: bundledUrl(entry.image) };
   const url = imageUrl(s, entry.image);
   if (!url) return null;
-  try {
-    const blob = await download(await openCache(), url);
-    return { entry, src: URL.createObjectURL(blob) };
-  } catch {
-    return null;
-  }
+  const blob = (await fromCache(cache, url).catch(() => null)) ?? (await download(cache, url).catch(() => null));
+  return blob ? { entry, src: URL.createObjectURL(blob) } : null;
 }
 
 /** Saves the photos of the next days, and removes saved photos that are not in the list. */
